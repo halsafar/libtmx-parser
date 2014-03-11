@@ -121,12 +121,17 @@ public:
 
 
 	std::unique_ptr<TmxMap> parseFromMemory(void* data, size_t length);
+
+
+	//unsigned int gidToLayer
 protected:
 
 
 private:
+	std::unique_ptr<TmxMap> _parseMapNode(tinyxml2::XMLElement* element);
 
 
+	TmxPropertyMap_t _parsePropertyNode(tinyxml2::XMLElement* element);
 };
 
 

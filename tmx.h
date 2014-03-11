@@ -7,8 +7,10 @@
 #define _LIB_TMX_PARSER_H_
 
 
+#include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include <tinyxml2.h>
 
@@ -62,18 +64,6 @@ typedef struct
 
 typedef struct
 {
-	std::string version;
-	std::string orientation;
-	unsigned int width;
-	unsigned int height;
-	unsigned int tileWidth;
-	unsigned int tileHeight;
-	std::string backgroundColor;
-} TmxMap;
-
-
-typedef struct
-{
 	std::string format;
 	std::string source;
 	std::string transparentColor;
@@ -98,6 +88,23 @@ typedef struct
 } TmxLayer;
 
 
+typedef std::vector<std::shared_ptr<TmxLayer>> TmxLayerCollection_t;
+
+
+typedef struct
+{
+	std::string version;
+	std::string orientation;
+	unsigned int width;
+	unsigned int height;
+	unsigned int tileWidth;
+	unsigned int tileHeight;
+	std::string backgroundColor;
+	TmxPropertyMap_t propertyMap;
+	TmxLayerCollection_t layerCollection;
+} TmxMap;
+
+
 /*
  *
  */
@@ -110,6 +117,10 @@ public:
 	virtual ~Tmx();
 
 
+	std::unique_ptr<TmxMap> parseFromFile(const std::string& fileName);
+
+
+	std::unique_ptr<TmxMap> parseFromMemory(void* data, size_t length);
 protected:
 
 

@@ -44,22 +44,14 @@ typedef struct
 } TmxTileDefinition;
 
 
+typedef std::vector<TmxTileDefinition> TmxTileDefinitionCollection_t;
+
+
 typedef struct
 {
 	unsigned int x;
 	unsigned int y;
 } TmxTileOffset;
-
-
-typedef struct
-{
-	unsigned int firstgid;
-	std::string name;
-	unsigned int tileWidth;
-	unsigned int tileHeight;
-	unsigned int tileSpacingInImage;
-	unsigned int tileMarginInImage;
-} TmxTileset;
 
 
 typedef struct
@@ -74,8 +66,27 @@ typedef struct
 
 typedef struct
 {
+	unsigned int firstgid;
+	std::string name;
+	unsigned int tileWidth;
+	unsigned int tileHeight;
+	unsigned int tileSpacingInImage;
+	unsigned int tileMarginInImage;
+	TmxImage image;
+	TmxTileDefinitionCollection_t _tiles;
+} TmxTileset;
+
+
+typedef std::vector<TmxTileset> TmxTilesetCollection_t;
+
+
+typedef struct
+{
 	unsigned int gid;
 } TmxLayerTile;
+
+
+typedef std::vector<TmxLayerTile> TmxLayerTileCollection_t;
 
 
 typedef struct
@@ -85,10 +96,12 @@ typedef struct
 	unsigned int height;
 	float opacity;
 	bool visible;
+	TmxPropertyMap_t propertyMap;
+	TmxLayerTileCollection_t tiles;
 } TmxLayer;
 
 
-typedef std::vector<std::shared_ptr<TmxLayer>> TmxLayerCollection_t;
+typedef std::vector<TmxLayer> TmxLayerCollection_t;
 
 
 typedef struct
@@ -101,6 +114,7 @@ typedef struct
 	unsigned int tileHeight;
 	std::string backgroundColor;
 	TmxPropertyMap_t propertyMap;
+	TmxTilesetCollection_t tilesetCollection;
 	TmxLayerCollection_t layerCollection;
 } TmxMap;
 
@@ -132,6 +146,21 @@ private:
 
 
 	TmxPropertyMap_t _parsePropertyNode(tinyxml2::XMLElement* element);
+
+
+	TmxImage _parseImageNode(tinyxml2::XMLElement* element);
+
+
+	TmxTileset _parseTilesetNode(tinyxml2::XMLElement* element);
+
+
+	TmxTileDefinition _parseTileDefinitionNode(tinyxml2::XMLElement* element);
+
+
+	TmxLayer _parseLayerNode(tinyxml2::XMLElement* element);
+
+
+	TmxLayerTile _parseLayerTileNode(tinyxml2::XMLElement* element);
 };
 
 

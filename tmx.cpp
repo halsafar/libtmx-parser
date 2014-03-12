@@ -1,8 +1,25 @@
 
+#include "tmx.h"
 
 #include <iostream>
 
-#include "tmx.h"
+#include "log.h"
+
+
+// TODO - remove these
+#define VALIDATE_ELEMENT_NAME(NAME, VERIFYNAME) \
+	strcmp(NAME, VERIFYNAME) == 0 ? true : false
+
+
+#define CHECK_AND_RETRIEVE_ATTRIBUTE_STRING(XMLELEMENT, ATTRIBNAME, LHS) \
+	if (XMLELEMENT->Attribute(ATTRIBNAME) != NULL) \
+	{ \
+		LHS = XMLELEMENT->Attribute(ATTRIBNAME); \
+	} \
+	else \
+	{ \
+		LOGE("MISSING ATTRIBUTE"); \
+	}
 
 
 namespace TmxParser
@@ -27,11 +44,20 @@ std::unique_ptr<TmxMap> Tmx::parseFromFile(const std::string& fileName)
 	tinyxml2::XMLDocument doc;
 	if (doc.LoadFile(fileName.c_str()) != tinyxml2::XML_SUCCESS)
 	{
-		printf("Cannot read xml file\n");
+		LOGE("Cannot read xml file\n");
 		return nullptr;
 	}
 
+	// parse the map node
 	std::unique_ptr<TmxMap> retVal = _parseMapNode(doc.FirstChildElement("map"));
+	if (retVal == nullptr)
+	{
+		LOGE("Cannot parse the node");
+		return nullptr;
+	}
+
+	// attempt to parse tileset nodes
+
 
 	return retVal;
 }
@@ -49,14 +75,24 @@ std::unique_ptr<TmxMap> Tmx::_parseMapNode(tinyxml2::XMLElement* element)
 	retVal->version = element->Attribute("version");
 	retVal->orientation = element->Attribute("orientation");
 	retVal->width = element->UnsignedAttribute("width");
-	retVal->width = element->UnsignedAttribute("height");
+	retVal->height = element->UnsignedAttribute("height");
 	retVal->tileWidth = element->UnsignedAttribute("tilewidth");
 	retVal->tileHeight = element->UnsignedAttribute("tileheight");
 	retVal->backgroundColor = element->Attribute("backgroundcolor");
+
 	retVal->propertyMap = this->_parsePropertyNode(element->FirstChildElement("properties"));
 
-	std::cout << element->FloatAttribute("width") << std::endl;
-	std::cout << element->Name() << std::endl;
+	for (tinyxml2::XMLElement* child = element->FirstChildElement("tileset"); child != NULL; child = child->NextSiblingElement("tileset"))
+	{
+		TmxTileset set = this->_parseTilesetNode(child);
+		retVal->tilesetCollection.push_back(set);
+	}
+
+	for (tinyxml2::XMLElement* child = element->FirstChildElement("layer"); child != NULL; child = child->NextSiblingElement("layer"))
+	{
+		LOGI("NAME: %s", child->Name());
+		retVal->layerCollection.push_back(this->_parseLayerNode(child));
+	}
 
 	return retVal;
 }
@@ -66,18 +102,105 @@ TmxPropertyMap_t Tmx::_parsePropertyNode(tinyxml2::XMLElement* element)
 {
 	TmxPropertyMap_t retVal;
 
-	tinyxml2::XMLElement* propertyElement = element->FirstChildElement("property");
-
-	for (tinyxml2::XMLElement* child = propertyElement->FirstChildElement(); child != NULL; child = child->NextSiblingElement())
+	if (element == NULL)
 	{
-		if (strcmp(child->Name(), "property"))
+		return retVal;
+	}
+
+	for (tinyxml2::XMLElement* child = element->FirstChildElement("property"); child != NULL; child = child->NextSiblingElement("property"))
+	{
+		if (VALIDATE_ELEMENT_NAME(child->Name(), "property"))
 		{
-			//element->Attribute("name")
+			retVal[child->Attribute("name")] = child->Attribute("value");
 		}
 	}
 
+	return retVal;
+}
+
+
+TmxImage Tmx::_parseImageNode(tinyxml2::XMLElement* element)
+{
+	TmxImage retVal;
+
+	CHECK_AND_RETRIEVE_ATTRIBUTE_STRING(element, "source", retVal.source);
+
+	if (element->Attribute("format") != NULL)
+	{
+		retVal.format = element->Attribute("format");
+	}
+
+	CHECK_AND_RETRIEVE_ATTRIBUTE_STRING(element, "trans", retVal.transparentColor);
+
+	//retVal.transparentColor = element->Attribute("trans");
+	retVal.width = element->UnsignedAttribute("width");
+	retVal.height = element->UnsignedAttribute("height");
 
 	return retVal;
+}
+
+
+TmxTileset Tmx::_parseTilesetNode(tinyxml2::XMLElement* element)
+{
+	TmxTileset retVal;
+
+	if (VALIDATE_ELEMENT_NAME(element->Name(), "tileset"))
+	{
+		retVal.firstgid = element->UnsignedAttribute("firstgid");
+		retVal.name = element->Attribute("name");
+		retVal.tileWidth = element->UnsignedAttribute("tilewidth");
+		retVal.tileHeight = element->UnsignedAttribute("tileheight");
+		retVal.tileSpacingInImage = element->UnsignedAttribute("spacing");
+		retVal.tileMarginInImage = element->UnsignedAttribute("margin");
+		retVal.image = _parseImageNode(element->FirstChildElement("image"));
+
+		for (tinyxml2::XMLElement* child = element->FirstChildElement("tile"); child != NULL; child = child->NextSiblingElement("tile"))
+		{
+			retVal._tiles.push_back(this->_parseTileDefinitionNode(child));
+		}
+	}
+
+	return retVal;
+}
+
+
+TmxTileDefinition Tmx::_parseTileDefinitionNode(tinyxml2::XMLElement* element)
+{
+	TmxTileDefinition retVal;
+
+	retVal.id = element->UnsignedAttribute("id");
+	retVal.propertyMap = _parsePropertyNode(element->FirstChildElement("properties"));
+
+	return retVal;
+}
+
+
+/*
+ * 	std::string name;
+	unsigned int width;
+	unsigned int height;
+	float opacity;
+	bool visible;
+ */
+
+TmxLayer Tmx::_parseLayerNode(tinyxml2::XMLElement* element)
+{
+	TmxLayer retVal;
+
+	retVal.name = element->Attribute("name");
+	retVal.opacity = element->FloatAttribute("opacity");
+	retVal.visible = element->IntAttribute("visible");
+	retVal.width = element->UnsignedAttribute("width");
+	retVal.height = element->UnsignedAttribute("height");
+	retVal.propertyMap = _parsePropertyNode(element->FirstChildElement("properties"));
+
+	return retVal;
+}
+
+
+TmxLayerTile Tmx::_parseLayerTileNode(tinyxml2::XMLElement* element)
+{
+
 }
 
 

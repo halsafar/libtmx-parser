@@ -220,14 +220,6 @@ TmxTileDefinition Tmx::_parseTileDefinitionNode(tinyxml2::XMLElement* element)
 }
 
 
-/*
- * 	std::string name;
-	unsigned int width;
-	unsigned int height;
-	float opacity;
-	bool visible;
- */
-
 TmxLayer Tmx::_parseLayerNode(tinyxml2::XMLElement* element)
 {
 	TmxLayer retVal;
@@ -239,13 +231,36 @@ TmxLayer Tmx::_parseLayerNode(tinyxml2::XMLElement* element)
 	retVal.height = element->UnsignedAttribute("height");
 	retVal.propertyMap = _parsePropertyNode(element->FirstChildElement("properties"));
 
+	// check data node and type
+	tinyxml2::XMLElement* dataElement = element->FirstChildElement("data");
+	if (dataElement != NULL)
+	{
+		retVal.tiles = _parseLayerXmlDataNode(dataElement);
+	}
+
 	return retVal;
 }
 
 
-TmxLayerTile Tmx::_parseLayerTileNode(tinyxml2::XMLElement* element)
+TmxLayerTileCollection_t Tmx::_parseLayerXmlDataNode(tinyxml2::XMLElement* element)
 {
+	TmxLayerTileCollection_t retVal;
+	for (tinyxml2::XMLElement* child = element->FirstChildElement("tile"); child != NULL; child = child->NextSiblingElement("tile"))
+	{
+		retVal.push_back(_parseLayerXmlTileNode(child));
+	}
+	return retVal;
+}
 
+
+
+TmxLayerTile Tmx::_parseLayerXmlTileNode(tinyxml2::XMLElement* element)
+{
+	TmxLayerTile retVal;
+
+	retVal.gid = element->UnsignedAttribute("gid");
+
+	return retVal;
 }
 
 

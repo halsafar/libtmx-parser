@@ -24,6 +24,22 @@ typedef std::unordered_map<std::string, std::string> TmxPropertyMap_t;
 
 typedef enum
 {
+	kEncodingXml,
+	kEncodingBase64,
+	kEncodingCsv
+} TmxDataNodeEncodingType;
+
+
+typedef enum
+{
+	kCompressionNone,
+	kCompressionZlib,
+	kCompressionGzip,
+} TmxDataCompressionType;
+
+
+typedef enum
+{
 	kOrthogonal,
 	kIsometric,
 	kStaggered
@@ -160,7 +176,16 @@ private:
 	TmxLayer _parseLayerNode(tinyxml2::XMLElement* element);
 
 
-	TmxLayerTile _parseLayerTileNode(tinyxml2::XMLElement* element);
+	TmxLayerTileCollection_t _parseLayerXmlDataNode(tinyxml2::XMLElement* element);
+
+
+	TmxLayerTile _parseLayerXmlTileNode(tinyxml2::XMLElement* element);
+
+
+	TmxLayerTileCollection_t _parseLayerCsvDataNode(tinyxml2::XMLElement* element);
+
+
+	TmxLayerTileCollection_t _parseLayerBase64DataNode(tinyxml2::XMLElement* element);
 };
 
 

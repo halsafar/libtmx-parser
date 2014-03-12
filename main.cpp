@@ -52,16 +52,29 @@ void printTilesets(int depth, const TmxParser::TmxTilesetCollection_t& collectio
 	{
 		printf_depth(depth, "%s", "<tileset>");
 
-		depth = depth + 1;
+		int nextdepth = depth + 1;
 
-		printf_depth(depth, "Name: %s", (*it).name.c_str());
-		printf_depth(depth, "FirstGid: %u", (*it).firstgid);
-		printf_depth(depth, "Width: %u", (*it).tileWidth);
-		printf_depth(depth, "Height: %u", (*it).tileHeight);
-		printf_depth(depth, "MarginImage: %u", (*it).tileMarginInImage);
-		printf_depth(depth, "SpaceImage: %u", (*it).tileSpacingInImage);
-		printImageData(depth, (*it).image);
-		printTileDefinition(depth, (*it)._tiles);
+		printf_depth(nextdepth, "Name: %s", (*it).name.c_str());
+		printf_depth(nextdepth, "FirstGid: %u", (*it).firstgid);
+		printf_depth(nextdepth, "Width: %u", (*it).tileWidth);
+		printf_depth(nextdepth, "Height: %u", (*it).tileHeight);
+		printf_depth(nextdepth, "MarginImage: %u", (*it).tileMarginInImage);
+		printf_depth(nextdepth, "SpaceImage: %u", (*it).tileSpacingInImage);
+		printImageData(nextdepth, (*it).image);
+		printTileDefinition(nextdepth, (*it)._tiles);
+	}
+}
+
+
+void printLayerTiles(int depth, const TmxParser::TmxLayerTileCollection_t& collection)
+{
+	for (auto it = collection.begin(); it != collection.end(); ++it)
+	{
+		printf_depth(depth, "%s", "<tile>");
+
+		int nextdepth = depth + 1;
+
+		printf_depth(nextdepth, "Gid: %u", it->gid);
 	}
 }
 
@@ -72,14 +85,15 @@ void printLayers(int depth, const TmxParser::TmxLayerCollection_t& collection)
 	{
 		printf_depth(depth, "%s", "<layer>");
 
-		depth = depth + 1;
+		int nextdepth = depth + 1;
 
-		printf_depth(depth, "Name: %s", it->name.c_str());
-		printf_depth(depth, "Width: %u", (*it).width);
-		printf_depth(depth, "Height: %u", (*it).height);
-		printf_depth(depth, "Opacity: %f", (*it).opacity);
-		printf_depth(depth, "Visible: %u", (*it).visible);
-		printProperties(depth+1, it->propertyMap);
+		printf_depth(nextdepth, "Name: %s", it->name.c_str());
+		printf_depth(nextdepth, "Width: %u", (*it).width);
+		printf_depth(nextdepth, "Height: %u", (*it).height);
+		printf_depth(nextdepth, "Opacity: %f", (*it).opacity);
+		printf_depth(nextdepth, "Visible: %u", (*it).visible);
+		printProperties(nextdepth+1, it->propertyMap);
+		printLayerTiles(nextdepth+1, it->tiles);
 	}
 }
 

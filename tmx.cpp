@@ -1,9 +1,54 @@
 
 #include "tmx.h"
 
-#include <iostream>
 
-#include "log.h"
+#if (defined(_WIN32))
+     #include <string.h>
+#endif
+
+#if (( defined(ANDROID)))
+     #include <android/log.h>
+     #include <string.h>
+#else
+	#include <cstdlib>
+	#include <cstdio>
+#endif
+
+
+#define LOG_TAG "libtmxparser"
+
+
+// quote define define :D
+#  define QUOTEME_(x) #x
+#  define QUOTEME(x) QUOTEME_(x)
+
+
+// print helpers
+#define WHERESTR  "[file %s, line %d]: "
+#define WHEREARG  __FILE__, __LINE__
+
+
+// LOGGING
+#if (( defined(ANDROID)))
+     #ifdef DEBUG
+          #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, " (" __FILE__ ":" QUOTEME(__LINE__) ") " __VA_ARGS__ )
+     #else
+          #define LOGD(...)
+     #endif
+
+     #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, "" __VA_ARGS__ )
+     #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__ )
+	 #define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__ )
+#else
+     #ifdef DEBUG
+     #define LOGD(...) fprintf(stderr, "D/" LOG_TAG " (" __FILE__ ":" QUOTEME(__LINE__) "): " __VA_ARGS__ ); fprintf(stderr, "\n");
+     #else
+     #define LOGD(...)
+     #endif
+     #define LOGI(...) fprintf(stdout, "I/" QUOTEME(LOG_TAG) "(" ")" __VA_ARGS__ ); fprintf(stdout, "\n");
+     #define LOGE(...) fprintf(stderr, "E/" QUOTEME(LOG_TAG) "(" ")" __VA_ARGS__ ); fprintf(stderr, "\n");
+	 #define LOGW(...) fprintf(stderr, "W/" QUOTEME(LOG_TAG) "(" ")" __VA_ARGS__ ); fprintf(stderr, "\n");
+#endif
 
 
 // TODO - remove these

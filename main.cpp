@@ -122,8 +122,21 @@ int main()
 	printf("tmxparser::main()\n");
 
 	tmxparser::TmxMap map;
-	tmxparser::TmxReturn error = tmxparser::parseFromFile("example.tmx", &map);
 
+	//tmxparser::TmxReturn error = tmxparser::parseFromFile("example.tmx", &map);
+
+	FILE* fp;
+	fp = fopen("example.tmx", "rb");
+	fseek( fp, 0, SEEK_SET );
+	fgetc( fp );
+	fseek( fp, 0, SEEK_END );
+	size_t size = ftell( fp );
+	fseek( fp, 0, SEEK_SET );
+
+	char* charBuffer = new char[size+1];
+	size_t read = fread( charBuffer, 1, size, fp );
+
+	tmxparser::TmxReturn error = tmxparser::parseFromMemory(charBuffer, size, &map);
 	if (!error)
 	{
 		printTmxMapData(&map);

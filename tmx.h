@@ -7,7 +7,6 @@
 #define _LIB_TMX_PARSER_H_
 
 
-#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -15,18 +14,33 @@
 #include <tinyxml2.h>
 
 
-namespace TmxParser
+namespace tmxparser
 {
+
+
+typedef enum
+{
+	kSuccess,
+	kErrorParsing,
+	kMissingRequiredAttribute,
+	kMissingMapNode,
+	kMissingDataNode,
+	kMalformedPropertyNode,
+} TmxReturn;
+
 
 
 typedef std::unordered_map<std::string, std::string> TmxPropertyMap_t;
 
 
+/**
+ * Used to identify tmx file encoding type for data tags
+ */
 typedef enum
 {
-	kEncodingXml,
-	kEncodingBase64,
-	kEncodingCsv
+	kEncodingXml,   //!< No encoding in tiled means XML
+	kEncodingBase64,//!< kEncodingBase64
+	kEncodingCsv    //!< kEncodingCsv
 } TmxDataNodeEncodingType;
 
 
@@ -99,6 +113,8 @@ typedef std::vector<TmxTileset> TmxTilesetCollection_t;
 typedef struct
 {
 	unsigned int gid;
+	unsigned int layerIndex;
+	unsigned int tileInLayerIndex;
 } TmxLayerTile;
 
 
@@ -135,58 +151,11 @@ typedef struct
 } TmxMap;
 
 
-/*
- *
- */
-class Tmx
-{
-public:
-	Tmx();
+
+	TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap);
 
 
-	virtual ~Tmx();
-
-
-	std::unique_ptr<TmxMap> parseFromFile(const std::string& fileName);
-
-
-	std::unique_ptr<TmxMap> parseFromMemory(void* data, size_t length);
-
-
-	//unsigned int gidToLayer
-protected:
-
-
-private:
-	std::unique_ptr<TmxMap> _parseMapNode(tinyxml2::XMLElement* element);
-
-
-	TmxPropertyMap_t _parsePropertyNode(tinyxml2::XMLElement* element);
-
-
-	TmxImage _parseImageNode(tinyxml2::XMLElement* element);
-
-
-	TmxTileset _parseTilesetNode(tinyxml2::XMLElement* element);
-
-
-	TmxTileDefinition _parseTileDefinitionNode(tinyxml2::XMLElement* element);
-
-
-	TmxLayer _parseLayerNode(tinyxml2::XMLElement* element);
-
-
-	TmxLayerTileCollection_t _parseLayerXmlDataNode(tinyxml2::XMLElement* element);
-
-
-	TmxLayerTile _parseLayerXmlTileNode(tinyxml2::XMLElement* element);
-
-
-	TmxLayerTileCollection_t _parseLayerCsvDataNode(tinyxml2::XMLElement* element);
-
-
-	TmxLayerTileCollection_t _parseLayerBase64DataNode(tinyxml2::XMLElement* element);
-};
+	TmxReturn parseFromMemory(void* data, size_t length, TmxMap* outMap);
 
 
 }

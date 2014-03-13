@@ -12,7 +12,7 @@
 	printf("%*s " format "\n", ((depth)*DEPTH_SCALE), "", __VA_ARGS__)
 
 
-void printProperties(int depth, const TmxParser::TmxPropertyMap_t& map)
+void printProperties(int depth, const tmxparser::TmxPropertyMap_t& map)
 {
 	printf_depth(depth, "%s", "<properties>");
 	for (auto it = map.begin(); it != map.end(); ++it)
@@ -22,7 +22,7 @@ void printProperties(int depth, const TmxParser::TmxPropertyMap_t& map)
 }
 
 
-void printImageData(int depth, const TmxParser::TmxImage& tmximage)
+void printImageData(int depth, const tmxparser::TmxImage& tmximage)
 {
 	printf_depth(depth, "%s", "<image>");
 
@@ -35,7 +35,7 @@ void printImageData(int depth, const TmxParser::TmxImage& tmximage)
 }
 
 
-void printTileDefinition(int depth, const TmxParser::TmxTileDefinitionCollection_t& collection)
+void printTileDefinition(int depth, const tmxparser::TmxTileDefinitionCollection_t& collection)
 {
 	for (auto it = collection.begin(); it != collection.end(); ++it)
 	{
@@ -46,7 +46,7 @@ void printTileDefinition(int depth, const TmxParser::TmxTileDefinitionCollection
 }
 
 
-void printTilesets(int depth, const TmxParser::TmxTilesetCollection_t& collection)
+void printTilesets(int depth, const tmxparser::TmxTilesetCollection_t& collection)
 {
 	for (auto it = collection.begin(); it != collection.end(); ++it)
 	{
@@ -66,7 +66,7 @@ void printTilesets(int depth, const TmxParser::TmxTilesetCollection_t& collectio
 }
 
 
-void printLayerTiles(int depth, const TmxParser::TmxLayerTileCollection_t& collection)
+void printLayerTiles(int depth, const tmxparser::TmxLayerTileCollection_t& collection)
 {
 	for (auto it = collection.begin(); it != collection.end(); ++it)
 	{
@@ -79,7 +79,7 @@ void printLayerTiles(int depth, const TmxParser::TmxLayerTileCollection_t& colle
 }
 
 
-void printLayers(int depth, const TmxParser::TmxLayerCollection_t& collection)
+void printLayers(int depth, const tmxparser::TmxLayerCollection_t& collection)
 {
 	for (auto it = collection.begin(); it != collection.end(); ++it)
 	{
@@ -98,7 +98,7 @@ void printLayers(int depth, const TmxParser::TmxLayerCollection_t& collection)
 }
 
 
-void printTmxMapData(const TmxParser::TmxMap* map)
+void printTmxMapData(const tmxparser::TmxMap* map)
 {
 	int depth = 0;
 
@@ -119,14 +119,17 @@ void printTmxMapData(const TmxParser::TmxMap* map)
 
 int main()
 {
-	std::cout << "Hello World" << std::endl;
+	printf("tmxparser::main()\n");
 
-	TmxParser::Tmx tmx;
-	std::unique_ptr<TmxParser::TmxMap> map = tmx.parseFromFile("example.tmx");
+	tmxparser::TmxMap map;
+	tmxparser::TmxReturn error = tmxparser::parseFromFile("example.tmx", &map);
 
-	printTmxMapData(map.get());
+	if (!error)
+	{
+		printTmxMapData(&map);
+	}
 
-	return 0;
+	return error;
 }
 
 

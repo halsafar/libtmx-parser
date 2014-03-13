@@ -113,8 +113,8 @@ typedef std::vector<TmxTileset> TmxTilesetCollection_t;
 typedef struct
 {
 	unsigned int gid;
-	unsigned int layerIndex;
-	unsigned int tileInLayerIndex;
+	unsigned int tilesetIndex;
+	unsigned int tileInTilesetIndex;
 } TmxLayerTile;
 
 

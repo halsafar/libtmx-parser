@@ -308,8 +308,8 @@ TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTileset
 
 	outTile->gid = element->UnsignedAttribute("gid");
 
-	outTile->layerIndex = 0;
-	outTile->tileInLayerIndex = 0;
+	outTile->tilesetIndex = 0;
+	outTile->tileInTilesetIndex = 0;
 
 	// search for layerindex
 	// O(n) where n = number of tilesets
@@ -324,9 +324,9 @@ TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTileset
 
 		if (outTile->gid >= startIndex && outTile->gid < endIndex)
 		{
-			outTile->layerIndex = index;
+			outTile->tilesetIndex = index;
 
-			outTile->tileInLayerIndex = (outTile->gid) - lastEndIndex;
+			outTile->tileInTilesetIndex = (outTile->gid) - lastEndIndex;
 
 			return error;
 		}

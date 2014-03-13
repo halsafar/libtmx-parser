@@ -85,7 +85,7 @@ TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap)
 	tinyxml2::XMLDocument doc;
 	if (doc.LoadFile(fileName.c_str()) != tinyxml2::XML_SUCCESS)
 	{
-		LOGE("Cannot read xml file\n");
+		LOGE("Cannot read xml file");
 		return TmxReturn::kErrorParsing;
 	}
 
@@ -97,7 +97,13 @@ TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap)
 TmxReturn parseFromMemory(void* data, size_t length, TmxMap* outMap)
 {
 	tinyxml2::XMLDocument doc;
-	//doc.Lo
+	if (doc.LoadMemory((char*)data, length))
+	{
+		LOGE("Cannot parse xml memory file...");
+		return TmxReturn::kErrorParsing;
+	}
+
+	return _parseMapNode(doc.FirstChildElement("map"), outMap);
 }
 
 

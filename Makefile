@@ -1,9 +1,9 @@
 
-all: tmx.o main.o tinyxml2.o
-	g++ tmx.o main.o tinyxml2.o -o tmxparse_test
+all: tmxparser.o main.o tinyxml2.o
+	g++ tmxparser.o main.o tinyxml2.o -o tmxparse_test
 	
-tmx.o: tmx.cpp
-	g++ -g -std=c++11 -c -I./libs/tinyxml2/ tmx.cpp
+tmxparser.o: tmxparser.cpp
+	g++ -g -std=c++11 -c -I./libs/tinyxml2/ tmxparser.cpp
 	
 main.o: main.cpp
 	g++ -g -std=c++11 -c -I./libs/tinyxml2/ main.cpp
@@ -12,4 +12,4 @@ tinyxml2.o: ./libs/tinyxml2/tinyxml2.cpp
 	g++ -g -std=c++11 -c -I./libs/tinyxml2/ ./libs/tinyxml2/tinyxml2.cpp
 	
 clean:
-	rm tmx.o main.o tinyxml2.o tmxparse_test
+	rm tmxparser.o main.o tinyxml2.o tmxparse_test

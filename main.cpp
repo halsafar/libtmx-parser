@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "tmx.h"
+#include "tmxparser.h"
 
 
 #define DEPTH_SCALE 5
@@ -123,9 +123,11 @@ int main()
 
 	tmxparser::TmxMap map;
 
-	//tmxparser::TmxReturn error = tmxparser::parseFromFile("example.tmx", &map);
+	// test from file
+	tmxparser::TmxReturn error = tmxparser::parseFromFile("example.tmx", &map);
 
-	FILE* fp;
+	// test from memory
+	/*FILE* fp;
 	fp = fopen("example.tmx", "rb");
 	fseek( fp, 0, SEEK_SET );
 	fgetc( fp );
@@ -136,7 +138,8 @@ int main()
 	char* charBuffer = new char[size+1];
 	size_t read = fread( charBuffer, 1, size, fp );
 
-	tmxparser::TmxReturn error = tmxparser::parseFromMemory(charBuffer, size, &map);
+	tmxparser::TmxReturn error = tmxparser::parseFromMemory(charBuffer, size, &map);*/
+
 	if (!error)
 	{
 		printTmxMapData(&map);

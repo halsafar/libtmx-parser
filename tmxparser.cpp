@@ -1,5 +1,5 @@
 
-#include "tmx.h"
+#include "tmxparser.h"
 
 
 #if (defined(_WIN32))

@@ -1,7 +1,7 @@
 # libtmx-parser
 
 ## Features
-- Parses tiled 0.9.1 maps.
+- Parses tiled-qt 0.9.1 maps, version 1.0 tmx files
 - Lightweight
 - Using TinyXML2
 - Easy to drop into a project

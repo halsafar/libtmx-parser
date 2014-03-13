@@ -72,9 +72,9 @@ TmxReturn _parsePropertyNode(tinyxml2::XMLElement* element, TmxPropertyMap_t* ou
 TmxReturn _parseImageNode(tinyxml2::XMLElement* element, TmxImage* outImage);
 TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTileset);
 TmxReturn _parseTileDefinitionNode(tinyxml2::XMLElement* element, TmxTileDefinition* outTileDefinition);
-TmxReturn _parseLayerNode(tinyxml2::XMLElement* element, TmxLayer* outLayer);
-TmxReturn _parseLayerXmlDataNode(tinyxml2::XMLElement* element, TmxLayerTileCollection_t* outTileCollection);
-TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, TmxLayerTile* outTile);
+TmxReturn _parseLayerNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayer* outLayer);
+TmxReturn _parseLayerXmlDataNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTileCollection_t* outTileCollection);
+TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTile* outTile);
 //TmxLayerTileCollection_t _parseLayerCsvDataNode(tinyxml2::XMLElement* element);
 //TmxLayerTileCollection_t _parseLayerBase64DataNode(tinyxml2::XMLElement* element);
 
@@ -146,7 +146,7 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 	for (tinyxml2::XMLElement* child = element->FirstChildElement("layer"); child != NULL; child = child->NextSiblingElement("layer"))
 	{
 		TmxLayer layer;
-		error = _parseLayerNode(child, &layer);
+		error = _parseLayerNode(child, outMap->tilesetCollection, &layer);
 		if (error)
 		{
 			LOGE("Error processing layer node...");
@@ -255,7 +255,7 @@ TmxReturn _parseTileDefinitionNode(tinyxml2::XMLElement* element, TmxTileDefinit
 }
 
 
-TmxReturn _parseLayerNode(tinyxml2::XMLElement* element, TmxLayer* outLayer)
+TmxReturn _parseLayerNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayer* outLayer)
 {
 	TmxReturn error = TmxReturn::kSuccess;
 
@@ -276,7 +276,7 @@ TmxReturn _parseLayerNode(tinyxml2::XMLElement* element, TmxLayer* outLayer)
 	tinyxml2::XMLElement* dataElement = element->FirstChildElement("data");
 	if (dataElement != NULL)
 	{
-		error = _parseLayerXmlDataNode(dataElement, &outLayer->tiles);
+		error = _parseLayerXmlDataNode(dataElement, tilesets, &outLayer->tiles);
 	}
 	else
 	{
@@ -288,13 +288,13 @@ TmxReturn _parseLayerNode(tinyxml2::XMLElement* element, TmxLayer* outLayer)
 }
 
 
-TmxReturn _parseLayerXmlDataNode(tinyxml2::XMLElement* element, TmxLayerTileCollection_t* outTileCollection)
+TmxReturn _parseLayerXmlDataNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTileCollection_t* outTileCollection)
 {
 	TmxReturn error = TmxReturn::kSuccess;
 	for (tinyxml2::XMLElement* child = element->FirstChildElement("tile"); child != NULL; child = child->NextSiblingElement("tile"))
 	{
 		TmxLayerTile tile;
-		error = _parseLayerXmlTileNode(child, &tile);
+		error = _parseLayerXmlTileNode(child, tilesets, &tile);
 		outTileCollection->push_back(tile);
 	}
 	return error;
@@ -302,11 +302,40 @@ TmxReturn _parseLayerXmlDataNode(tinyxml2::XMLElement* element, TmxLayerTileColl
 
 
 
-TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, TmxLayerTile* outTile)
+TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTile* outTile)
 {
 	TmxReturn error = TmxReturn::kSuccess;
 
 	outTile->gid = element->UnsignedAttribute("gid");
+
+	outTile->layerIndex = 0;
+	outTile->tileInLayerIndex = 0;
+
+	// search for layerindex
+	// O(n) where n = number of tilesets
+	// Generally n will never be high but this method is called from an O(m) method.
+	int index = 0;
+	int lastStartIndex = 0;
+	int lastEndIndex = 1;
+	for (auto it = tilesets.begin(); it != tilesets.end(); ++it)
+	{
+		int startIndex = it->firstgid;
+		int endIndex = it->firstgid + ( (it->image.width / it->tileWidth) * (it->image.height / it->tileHeight) );
+
+		if (outTile->gid >= startIndex && outTile->gid < endIndex)
+		{
+			outTile->layerIndex = index;
+
+			outTile->tileInLayerIndex = (outTile->gid) - lastEndIndex;
+
+			return error;
+		}
+
+		lastStartIndex = startIndex;
+		lastEndIndex = endIndex;
+
+		index++;
+	}
 
 	return error;
 }

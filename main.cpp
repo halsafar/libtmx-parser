@@ -121,10 +121,11 @@ int main()
 {
 	printf("tmxparser::main()\n");
 
+	tmxparser::TmxReturn error;
 	tmxparser::TmxMap map;
 
 	// test from file
-	tmxparser::TmxReturn error = tmxparser::parseFromFile("example.tmx", &map);
+	error = tmxparser::parseFromFile("example.tmx", &map);
 
 	// test from memory
 	/*FILE* fp;
@@ -138,7 +139,7 @@ int main()
 	char* charBuffer = new char[size+1];
 	size_t read = fread( charBuffer, 1, size, fp );
 
-	tmxparser::TmxReturn error = tmxparser::parseFromMemory(charBuffer, size, &map);*/
+	t = tmxparser::parseFromMemory(charBuffer, size, &map);*/
 
 	if (!error)
 	{

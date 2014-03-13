@@ -97,7 +97,7 @@ TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap)
 TmxReturn parseFromMemory(void* data, size_t length, TmxMap* outMap)
 {
 	tinyxml2::XMLDocument doc;
-	if (doc.LoadMemory((char*)data, length))
+	if (doc.Parse((char*)data, length))
 	{
 		LOGE("Cannot parse xml memory file...");
 		return TmxReturn::kErrorParsing;

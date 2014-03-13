@@ -12,6 +12,8 @@
 - Parse objects
 - Parse terrain
 - Remove c++11 requirement
+- Fix error reporting
+- Check for NULLs and report errors
 - Go C
 
 

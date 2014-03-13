@@ -75,6 +75,8 @@ void printLayerTiles(int depth, const tmxparser::TmxLayerTileCollection_t& colle
 		int nextdepth = depth + 1;
 
 		printf_depth(nextdepth, "Gid: %u", it->gid);
+		printf_depth(nextdepth, "Lid: %u", it->tilesetIndex);
+		printf_depth(nextdepth, "Tid: %u", it->tileInTilesetIndex);
 	}
 }
 

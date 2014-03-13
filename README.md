@@ -2,6 +2,7 @@
 
 ## Features
 - Parses tiled-qt 0.9.1 maps, version 1.0 tmx files
+- Simple, returns a struct filled with map data
 - Lightweight
 - Using TinyXML2
 - Easy to drop into a project
@@ -10,7 +11,8 @@
 # TODO
 - Parse objects
 - Parse terrain
-- Possibly remove c++11 requirement
+- Remove c++11 requirement
+- Go C
 
 
 # COMPILING

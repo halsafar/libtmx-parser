@@ -152,10 +152,23 @@ typedef struct
 
 
 
-	TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap);
+/**
+ * Parse a tmx from a filename.
+ * @param fileName
+ * @param outMap
+ * @return
+ */
+TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap);
 
 
-	TmxReturn parseFromMemory(void* data, size_t length, TmxMap* outMap);
+/**
+ * Parse a tmx file from memory.
+ * @param data Tmx file in memory
+ * @param length Size of the data buffer
+ * @param outMap
+ * @return
+ */
+TmxReturn parseFromMemory(void* data, size_t length, TmxMap* outMap);
 
 
 }

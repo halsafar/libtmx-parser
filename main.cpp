@@ -14,6 +14,11 @@
 
 void printProperties(int depth, const tmxparser::TmxPropertyMap_t& map)
 {
+	if (map.empty())
+	{
+		return;
+	}
+
 	printf_depth(depth, "%s", "<properties>");
 	for (auto it = map.begin(); it != map.end(); ++it)
 	{
@@ -100,6 +105,23 @@ void printLayers(int depth, const tmxparser::TmxLayerCollection_t& collection)
 }
 
 
+void printObjectGroups(int depth, const tmxparser::TmxObjectGroupCollection_t collection)
+{
+	int nextdepth = depth +1;
+
+	for (auto it = collection.begin(); it != collection.end(); ++it)
+	{
+		printf_depth(depth, "%s", "<objectgroup>");
+
+		printf_depth(nextdepth, "Name: %s", it->name.c_str());
+		printf_depth(nextdepth, "Color: %s", it->color.c_str());
+		printf_depth(nextdepth, "Opacity: %f", it->opacity);
+		printf_depth(nextdepth, "Visible: %u", it->visible);
+		printProperties(nextdepth, it->propertyMap);
+	}
+}
+
+
 void printTmxMapData(const tmxparser::TmxMap* map)
 {
 	int depth = 0;
@@ -116,6 +138,7 @@ void printTmxMapData(const tmxparser::TmxMap* map)
 	printProperties(depth+1, map->propertyMap);
 	printTilesets(depth+1, map->tilesetCollection);
 	printLayers(depth+1, map->layerCollection);
+	printObjectGroups(depth+1, map->objectGroupCollection);
 }
 
 

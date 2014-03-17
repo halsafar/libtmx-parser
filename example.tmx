@@ -26,10 +26,10 @@
  <layer name="Tile Layer 1" width="10" height="10">
   <data>
    <tile gid="101"/>
+   <tile gid="100"/>
+   <tile gid="280"/>
    <tile gid="1"/>
    <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -127,51 +127,12 @@
    <tile gid="0"/>
   </data>
  </layer>
- <layer name="Test Layer" width="10" height="10" visible="0">
+ <layer name="Test Layer" width="10" height="10">
   <data>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="76"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="2"/>
-   <tile gid="5"/>
-   <tile gid="10"/>
-   <tile gid="76"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="3"/>
-   <tile gid="6"/>
-   <tile gid="9"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="1"/>
-   <tile gid="4"/>
-   <tile gid="7"/>
-   <tile gid="8"/>
-   <tile gid="11"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -181,9 +142,6 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -193,7 +151,49 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="1"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="146"/>
+   <tile gid="146"/>
+   <tile gid="146"/>
+   <tile gid="146"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -231,7 +231,33 @@
    <tile gid="0"/>
   </data>
  </layer>
- <objectgroup name="TestObject" width="10" height="10" visible="0">
-  <object x="37" y="36"/>
+ <objectgroup name="TestObject" width="10" height="10">
+  <properties>
+   <property name="objectlayerprop" value="666"/>
+  </properties>
+  <object x="7" y="11" width="51" height="51">
+   <properties>
+    <property name="asquare" value="test"/>
+   </properties>
+  </object>
+  <object x="93" y="-8" width="89" height="154">
+   <properties>
+    <property name="acircle" value="test"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object x="106" y="81">
+   <properties>
+    <property name="example_poly" value="111"/>
+   </properties>
+   <polygon points="0,0 147,-21 110,-118 -77,-85 -136,92 -34,189 111,86 1,401 -355,137 -266,-87 -228,-145 -72,-170 103,-156 149,-137 702,101"/>
+  </object>
+  <object x="111" y="270">
+   <properties>
+    <property name="lines" value="test"/>
+   </properties>
+   <polyline points="0,0 125,-38 150,-133 220,-178 383,-111 339,4 142,52"/>
+  </object>
  </objectgroup>
+ <objectgroup name="TestObject2" width="10" height="10"/>
 </map>

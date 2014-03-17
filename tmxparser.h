@@ -57,7 +57,16 @@ typedef enum
 	kOrthogonal,
 	kIsometric,
 	kStaggered
-} Orientation;
+} TmxOrientation;
+
+
+typedef enum
+{
+	kPolygon,
+	kPolyline,
+	kEllipse,
+	kSquare,
+} TmxShapeType;
 
 
 typedef struct
@@ -79,8 +88,8 @@ typedef std::vector<TmxTileDefinition> TmxTileDefinitionCollection_t;
 
 typedef struct
 {
-	unsigned int x;
-	unsigned int y;
+	int x;
+	int y;
 } TmxTileOffset;
 
 
@@ -136,6 +145,42 @@ typedef struct
 typedef std::vector<TmxLayer> TmxLayerCollection_t;
 
 
+typedef std::vector<std::pair<int, int>> TmxShapePointCollection_t;
+
+
+typedef struct
+{
+	std::string name;
+	std::string type;
+	int x;
+	int y;
+	unsigned int width;
+	unsigned int height;
+	float rotation;
+	unsigned int referenceGid;
+	bool visible;
+	TmxPropertyMap_t propertyMap;
+	TmxShapePointCollection_t shapePoints;
+} TmxObject;
+
+
+typedef std::vector<TmxObject> TmxObjectCollection_t;
+
+
+typedef struct
+{
+	std::string name;
+	std::string color;
+	float opacity;
+	bool visible;
+	TmxPropertyMap_t propertyMap;
+	TmxObjectCollection_t objects;
+} TmxObjectGroup;
+
+
+typedef std::vector<TmxObjectGroup> TmxObjectGroupCollection_t;
+
+
 typedef struct
 {
 	std::string version;
@@ -148,6 +193,7 @@ typedef struct
 	TmxPropertyMap_t propertyMap;
 	TmxTilesetCollection_t tilesetCollection;
 	TmxLayerCollection_t layerCollection;
+	TmxObjectGroupCollection_t objectGroupCollection;
 } TmxMap;
 
 

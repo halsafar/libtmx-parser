@@ -77,6 +77,8 @@ TmxReturn _parseLayerXmlDataNode(tinyxml2::XMLElement* element, const TmxTileset
 TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTile* outTile);
 //TmxLayerTileCollection_t _parseLayerCsvDataNode(tinyxml2::XMLElement* element);
 //TmxLayerTileCollection_t _parseLayerBase64DataNode(tinyxml2::XMLElement* element);
+TmxReturn _parseObjectGroupNode(tinyxml2::XMLElement* element, TmxObjectGroup* outObjectGroup);
+TmxReturn _parseObjectNode(tinyxml2::XMLElement* element, TmxObject* outObj);
 
 
 
@@ -154,6 +156,20 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 		}
 
 		outMap->layerCollection.push_back(layer);
+	}
+
+
+	for (tinyxml2::XMLElement* child = element->FirstChildElement("objectgroup"); child != NULL; child = child->NextSiblingElement("objectgroup"))
+	{
+		TmxObjectGroup group;
+		error = _parseObjectGroupNode(child, &group);
+		if (error)
+		{
+			LOGE("Error processing layer node...");
+			return error;
+		}
+
+		outMap->objectGroupCollection.push_back(group);
 	}
 
 	return error;
@@ -336,6 +352,53 @@ TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTileset
 
 		index++;
 	}
+
+	return error;
+}
+
+
+TmxReturn _parseObjectGroupNode(tinyxml2::XMLElement* element, TmxObjectGroup* outObjectGroup)
+{
+	TmxReturn error = TmxReturn::kSuccess;
+
+	outObjectGroup->name = element->Attribute("name");
+	if (element->Attribute("opacity") != NULL)
+	{
+		outObjectGroup->opacity = element->FloatAttribute("opacity");
+	}
+	else
+	{
+		outObjectGroup->opacity = 1.0f;
+	}
+
+	if (element->Attribute("visible") != NULL)
+	{
+		outObjectGroup->visible = element->BoolAttribute("visible");
+	}
+	else
+	{
+		outObjectGroup->visible = 1;
+	}
+
+	for (tinyxml2::XMLElement* child = element->FirstChildElement("object"); child != NULL; child = child->NextSiblingElement("object"))
+	{
+		TmxObject obj;
+		error = _parseObjectNode(child, &obj);
+		if (error)
+		{
+			LOGE("Error parsing object node...");
+			return TmxReturn::kErrorParsing;
+		}
+		outObjectGroup->objects.push_back(obj);
+	}
+
+	return error;
+}
+
+
+TmxReturn _parseObjectNode(tinyxml2::XMLElement* element, TmxObject* outObj)
+{
+	TmxReturn error = TmxReturn::kSuccess;
 
 	return error;
 }

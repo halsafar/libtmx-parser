@@ -438,7 +438,7 @@ TmxReturn _parseObjectNode(tinyxml2::XMLElement* element, TmxObject* outObj)
 		outObj->shapeType = kSquare;
 	}
 
-	if (outObj->shapeType == kPolygon || outObj->shapeType == kPolyline && shapeElement != NULL)
+	if ((outObj->shapeType == kPolygon || outObj->shapeType == kPolyline) && shapeElement != NULL)
 	{
 		if (shapeElement->Attribute("points") == NULL)
 		{

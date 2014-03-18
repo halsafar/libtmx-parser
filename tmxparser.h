@@ -160,6 +160,7 @@ typedef struct
 	unsigned int referenceGid;
 	bool visible;
 	TmxPropertyMap_t propertyMap;
+	TmxShapeType shapeType;
 	TmxShapePointCollection_t shapePoints;
 } TmxObject;
 

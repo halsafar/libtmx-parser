@@ -14,6 +14,9 @@
 	#include <cstdio>
 #endif
 
+#include <string>
+#include <sstream>
+
 
 #define LOG_TAG "libtmxparser"
 
@@ -157,7 +160,6 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 
 		outMap->layerCollection.push_back(layer);
 	}
-
 
 	for (tinyxml2::XMLElement* child = element->FirstChildElement("objectgroup"); child != NULL; child = child->NextSiblingElement("objectgroup"))
 	{
@@ -399,6 +401,67 @@ TmxReturn _parseObjectGroupNode(tinyxml2::XMLElement* element, TmxObjectGroup* o
 TmxReturn _parseObjectNode(tinyxml2::XMLElement* element, TmxObject* outObj)
 {
 	TmxReturn error = TmxReturn::kSuccess;
+
+	if (element->Attribute("name"))
+	{
+		outObj->name = element->Attribute("name");
+	}
+
+	if (element->Attribute("type"))
+	{
+		outObj->type = element->Attribute("type");
+	}
+	outObj->x = element->IntAttribute("x");
+	outObj->y = element->IntAttribute("y");
+	outObj->width = element->IntAttribute("width");
+	outObj->height = element->IntAttribute("height");
+	outObj->rotation = element->FloatAttribute("rotation");
+	outObj->referenceGid = element->UnsignedAttribute("gid");
+	outObj->visible = element->BoolAttribute("visible");
+	_parsePropertyNode(element, &outObj->propertyMap);
+
+	tinyxml2::XMLElement* shapeElement = NULL;
+	if ((shapeElement = element->FirstChildElement("ellipse")) != NULL)
+	{
+		outObj->shapeType = kEllipse;
+	}
+	else if ((shapeElement = element->FirstChildElement("polygon")) != NULL)
+	{
+		outObj->shapeType = kPolygon;
+	}
+	else if ((shapeElement = element->FirstChildElement("polyline")) != NULL)
+	{
+		outObj->shapeType = kPolyline;
+	}
+	else
+	{
+		outObj->shapeType = kSquare;
+	}
+
+	if (outObj->shapeType == kPolygon || outObj->shapeType == kPolyline && shapeElement != NULL)
+	{
+		if (shapeElement->Attribute("points") == NULL)
+		{
+			LOGE("Missing points attribute for shape requiring one...");
+			return TmxReturn::kErrorParsing;
+		}
+
+		std::string pointString = shapeElement->Attribute("points");
+		std::istringstream pairStringStream(pointString);
+		std::string pairToken;
+		while(std::getline(pairStringStream, pairToken, ' '))
+		{
+			std::pair<int, int> pair;
+			std::istringstream pointStringString(pairToken);
+			std::string pointToken;
+			std::getline(pointStringString, pointToken, ',');
+			pair.first = atoi(pointToken.c_str());
+			std::getline(pointStringString, pointToken, ',');
+			pair.second = atoi(pointToken.c_str());
+
+			outObj->shapePoints.push_back(pair);
+		}
+	}
 
 	return error;
 }

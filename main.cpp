@@ -122,6 +122,9 @@ void printObjects(int depth, const tmxparser::TmxObjectCollection_t& collection)
 		printf_depth(nextdepth, "rotation: %f", it->rotation);
 		printf_depth(nextdepth, "refGid: %u", it->referenceGid);
 		printf_depth(nextdepth, "visible: %u", it->visible);
+
+		printProperties(nextdepth, it->propertyMap);
+
 		printf_depth(nextdepth, "ShapeType: %u", it->shapeType);
 
 		printf_depth(nextdepth, "%s", "<shape>");

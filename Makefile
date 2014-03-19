@@ -2,7 +2,7 @@
 all: tmxparser.o main.o tinyxml2.o
 	g++ tmxparser.o main.o tinyxml2.o -o tmxparse_test
 	
-tmxparser.o: tmxparser.cpp
+tmxparser.o: tmxparser.cpp tmxparser.h
 	g++ -g -std=c++11 -c -I./libs/tinyxml2/ tmxparser.cpp
 	
 main.o: main.cpp

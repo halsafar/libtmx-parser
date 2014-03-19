@@ -8,7 +8,7 @@
 
 
 #include <string>
-#include <unordered_map>
+#include <map>
 #include <vector>
 
 #include <tinyxml2.h>
@@ -30,7 +30,7 @@ typedef enum
 
 
 
-typedef std::unordered_map<std::string, std::string> TmxPropertyMap_t;
+typedef std::map<std::string, std::string> TmxPropertyMap_t;
 
 
 /**

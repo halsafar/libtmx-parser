@@ -180,9 +180,11 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 
 TmxReturn _parsePropertyNode(tinyxml2::XMLElement* element, TmxPropertyMap_t* outPropertyMap)
 {
+	//LOGD("_parsePropertyNode(%p, %p)", element, outPropertyMap);
 	if (element == NULL)
 	{
 		// ignore this, not everything requires properties
+
 		return TmxReturn::kSuccess;
 	}
 
@@ -190,6 +192,8 @@ TmxReturn _parsePropertyNode(tinyxml2::XMLElement* element, TmxPropertyMap_t* ou
 	{
 		if (strcmp(child->Name(), "property") == 0)
 		{
+			LOGD("NAME:%s", child->Attribute("name"));
+			LOGD("VALUE:%s", child->Attribute("value"));
 			if (child->Attribute("name") != NULL && child->Attribute("value") != NULL)
 			{
 				(*outPropertyMap)[child->Attribute("name")] = child->Attribute("value");
@@ -364,6 +368,7 @@ TmxReturn _parseObjectGroupNode(tinyxml2::XMLElement* element, TmxObjectGroup* o
 	TmxReturn error = TmxReturn::kSuccess;
 
 	outObjectGroup->name = element->Attribute("name");
+
 	if (element->Attribute("opacity") != NULL)
 	{
 		outObjectGroup->opacity = element->FloatAttribute("opacity");
@@ -380,6 +385,12 @@ TmxReturn _parseObjectGroupNode(tinyxml2::XMLElement* element, TmxObjectGroup* o
 	else
 	{
 		outObjectGroup->visible = 1;
+	}
+
+	error = _parsePropertyNode(element->FirstChildElement("properties"), &outObjectGroup->propertyMap);
+	if (error)
+	{
+		return error;
 	}
 
 	for (tinyxml2::XMLElement* child = element->FirstChildElement("object"); child != NULL; child = child->NextSiblingElement("object"))
@@ -418,7 +429,13 @@ TmxReturn _parseObjectNode(tinyxml2::XMLElement* element, TmxObject* outObj)
 	outObj->rotation = element->FloatAttribute("rotation");
 	outObj->referenceGid = element->UnsignedAttribute("gid");
 	outObj->visible = element->BoolAttribute("visible");
-	_parsePropertyNode(element, &outObj->propertyMap);
+
+	error = _parsePropertyNode(element->FirstChildElement("properties"), &outObj->propertyMap);
+	if (error)
+	{
+		return error;
+	}
+
 
 	tinyxml2::XMLElement* shapeElement = NULL;
 	if ((shapeElement = element->FirstChildElement("ellipse")) != NULL)

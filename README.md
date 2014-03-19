@@ -9,15 +9,16 @@
 
 
 # TODO
-- Parse objects
 - Parse terrain
 - Remove c++11 requirement
-- Fix error reporting
-- Check for NULLs and report errors
-- Go C
+- Check for NULLs and report errors on certain 'required' attributes
 
 
 # COMPILING
+## Requires libs
+- [TinyXml2](https://github.com/leethomason/tinyxml2) is being used, as it is very lightweight and game dev friendly
+
+
 ## Required files
 - tmxparser.h
 - tmxparser.cpp

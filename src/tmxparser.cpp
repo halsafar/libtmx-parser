@@ -18,8 +18,9 @@
 #include <sstream>
 
 
+#ifndef LOG_TAG
 #define LOG_TAG "libtmxparser"
-
+#endif
 
 // quote define define :D
 #  define QUOTEME_(x) #x
@@ -336,13 +337,13 @@ TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTileset
 	// search for layerindex
 	// O(n) where n = number of tilesets
 	// Generally n will never be high but this method is called from an O(m) method.
-	int index = 0;
-	int lastStartIndex = 0;
-	int lastEndIndex = 1;
+	unsigned int index = 0;
+	//unsigned int lastStartIndex = 0;
+	unsigned int lastEndIndex = 1;
 	for (auto it = tilesets.begin(); it != tilesets.end(); ++it)
 	{
-		int startIndex = it->firstgid;
-		int endIndex = it->firstgid + ( (it->image.width / it->tileWidth) * (it->image.height / it->tileHeight) );
+		unsigned int startIndex = it->firstgid;
+		unsigned int endIndex = it->firstgid + ( (it->image.width / it->tileWidth) * (it->image.height / it->tileHeight) );
 
 		if (outTile->gid >= startIndex && outTile->gid < endIndex)
 		{
@@ -353,7 +354,7 @@ TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTileset
 			return error;
 		}
 
-		lastStartIndex = startIndex;
+		//lastStartIndex = startIndex;
 		lastEndIndex = endIndex;
 
 		index++;

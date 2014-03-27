@@ -9,6 +9,7 @@
 
 
 # TODO
+- Parse compressed layer tile data
 - Parse terrain
 - Remove c++11 requirement
 - Check for NULLs and report errors on certain 'required' attributes

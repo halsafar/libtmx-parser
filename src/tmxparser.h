@@ -8,7 +8,13 @@
 
 
 #include <string>
+
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#include <unordered_map>
+#else
 #include <map>
+#endif
+
 #include <vector>
 
 #include <tinyxml2.h>
@@ -29,8 +35,11 @@ typedef enum
 } TmxReturn;
 
 
-
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+typedef std::unordered_map<std::string, std::string> TmxPropertyMap_t;
+#else
 typedef std::map<std::string, std::string> TmxPropertyMap_t;
+#endif
 
 
 /**
@@ -145,7 +154,7 @@ typedef struct
 typedef std::vector<TmxLayer> TmxLayerCollection_t;
 
 
-typedef std::vector<std::pair<int, int>> TmxShapePointCollection_t;
+typedef std::vector<std::pair<int, int> > TmxShapePointCollection_t;
 
 
 typedef struct

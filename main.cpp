@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "tmxparser.h"
+#include "src/tmxparser.h"
 
 
 #define DEPTH_SCALE 5

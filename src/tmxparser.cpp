@@ -126,7 +126,7 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 	outMap->height = element->UnsignedAttribute("height");
 	outMap->tileWidth = element->UnsignedAttribute("tilewidth");
 	outMap->tileHeight = element->UnsignedAttribute("tileheight");
-	outMap->backgroundColor = element->Attribute("backgroundcolor");
+  outMap->backgroundColor = element->Attribute("backgroundcolor") || "";
 
 	TmxReturn error = _parsePropertyNode(element->FirstChildElement("properties"), &outMap->propertyMap);
 	if (error)

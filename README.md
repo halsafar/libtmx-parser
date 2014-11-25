@@ -1,5 +1,10 @@
 # libtmx-parser
 
+## Tested Operating Systems
+- Ubuntu
+- Android 2.2+/3.X/4.X
+
+
 ## Features
 - Parses tiled-qt 0.9.1 maps, version 1.0 tmx files
 - Simple, returns a struct filled with map data

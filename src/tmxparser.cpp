@@ -77,7 +77,7 @@ TmxReturn _parseImageNode(tinyxml2::XMLElement* element, TmxImage* outImage);
 TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTileset);
 TmxReturn _parseTileDefinitionNode(tinyxml2::XMLElement* element, TmxTileDefinition* outTileDefinition);
 TmxReturn _parseLayerNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayer* outLayer);
-TmxReturn _parseLayerXmlDataNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTileCollection_t* outTileCollection);
+TmxReturn _parseLayerDataNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTileCollection_t* outTileCollection);
 TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTile* outTile);
 //TmxLayerTileCollection_t _parseLayerCsvDataNode(tinyxml2::XMLElement* element);
 //TmxLayerTileCollection_t _parseLayerBase64DataNode(tinyxml2::XMLElement* element);
@@ -299,7 +299,7 @@ TmxReturn _parseLayerNode(tinyxml2::XMLElement* element, const TmxTilesetCollect
 	tinyxml2::XMLElement* dataElement = element->FirstChildElement("data");
 	if (dataElement != NULL)
 	{
-		error = _parseLayerXmlDataNode(dataElement, tilesets, &outLayer->tiles);
+		error = _parseLayerDataNode(dataElement, tilesets, &outLayer->tiles);
 	}
 	else
 	{
@@ -311,9 +311,18 @@ TmxReturn _parseLayerNode(tinyxml2::XMLElement* element, const TmxTilesetCollect
 }
 
 
-TmxReturn _parseLayerXmlDataNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTileCollection_t* outTileCollection)
+TmxReturn _parseLayerDataNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTileCollection_t* outTileCollection)
 {
 	TmxReturn error = TmxReturn::kSuccess;
+
+	const char* encoding = element->Attribute("encoding");
+	if (encoding != NULL)
+	{
+		LOGE("Unsupported layer compression... coming soon...");
+		error = TmxReturn::kErrorParsing;
+		return error;
+	}
+
 	for (tinyxml2::XMLElement* child = element->FirstChildElement("tile"); child != NULL; child = child->NextSiblingElement("tile"))
 	{
 		TmxLayerTile tile;

@@ -22,6 +22,14 @@
 #define LOG_TAG "libtmxparser"
 #endif
 
+
+#if defined(WIN32) || defined(_WIN32)
+#define PATH_SEPARATOR "\\"
+#else
+#define PATH_SEPARATOR "/"
+#endif
+
+
 // quote define define :D
 #  define QUOTEME_(x) #x
 #  define QUOTEME(x) QUOTEME_(x)
@@ -71,6 +79,8 @@ namespace tmxparser
 
 
 // Prototypes
+TmxReturn _parseStart(tinyxml2::XMLElement* element, TmxMap* outMap, const std::string& tilesetPath);
+TmxReturn _parseEnd(TmxMap* outMap, const std::string& tilesetPath);
 TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap);
 TmxReturn _parsePropertyNode(tinyxml2::XMLElement* element, TmxPropertyMap_t* outPropertyMap);
 TmxReturn _parseImageNode(tinyxml2::XMLElement* element, TmxImage* outImage);
@@ -86,7 +96,7 @@ TmxReturn _parseObjectNode(tinyxml2::XMLElement* element, TmxObject* outObj);
 
 
 
-TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap)
+TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap, const std::string& tilesetPath)
 {
 	tinyxml2::XMLDocument doc;
 	if (doc.LoadFile(fileName.c_str()) != tinyxml2::XML_SUCCESS)
@@ -96,11 +106,11 @@ TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap)
 	}
 
 	// parse the map node
-	return _parseMapNode(doc.FirstChildElement("map"), outMap);
+	return _parseStart(doc.FirstChildElement("map"), outMap, tilesetPath);
 }
 
 
-TmxReturn parseFromMemory(void* data, size_t length, TmxMap* outMap)
+TmxReturn parseFromMemory(void* data, size_t length, TmxMap* outMap, const std::string& tilesetPath)
 {
 	tinyxml2::XMLDocument doc;
 	if (doc.Parse((char*)data, length))
@@ -109,7 +119,26 @@ TmxReturn parseFromMemory(void* data, size_t length, TmxMap* outMap)
 		return TmxReturn::kErrorParsing;
 	}
 
-	return _parseMapNode(doc.FirstChildElement("map"), outMap);
+	return _parseStart(doc.FirstChildElement("map"), outMap, tilesetPath);
+}
+
+
+TmxReturn _parseStart(tinyxml2::XMLElement* element, TmxMap* outMap, const std::string& tilesetPath)
+{
+	TmxReturn retVal = _parseMapNode(element, outMap);
+	return _parseEnd(outMap, tilesetPath);
+}
+
+
+TmxReturn _parseEnd(TmxMap* outMap, const std::string& tilesetPath)
+{
+	for (auto tileIt = outMap->tilesetCollection.begin(); tileIt != outMap->tilesetCollection.end(); ++tileIt)
+	{
+		std::string baseFilename = tileIt->image.source.substr(tileIt->image.source.find_last_of(PATH_SEPARATOR) + 1);
+		tileIt->image.source = tilesetPath + baseFilename;
+	}
+
+	return TmxReturn::kSuccess;
 }
 
 
@@ -126,7 +155,7 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 	outMap->height = element->UnsignedAttribute("height");
 	outMap->tileWidth = element->UnsignedAttribute("tilewidth");
 	outMap->tileHeight = element->UnsignedAttribute("tileheight");
-  outMap->backgroundColor = element->Attribute("backgroundcolor") || "";
+	outMap->backgroundColor = element->Attribute("backgroundcolor") || "";
 
 	TmxReturn error = _parsePropertyNode(element->FirstChildElement("properties"), &outMap->propertyMap);
 	if (error)

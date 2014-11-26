@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="10" height="10" tilewidth="32" tileheight="32" backgroundcolor="#595959">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="32" tileheight="32" backgroundcolor="#595959" nextobjectid="5">
  <properties>
   <property name="name" value="Test"/>
   <property name="test" value="foo"/>
@@ -180,7 +180,7 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="0"/>
+   <tile gid="1"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -231,33 +231,33 @@
    <tile gid="0"/>
   </data>
  </layer>
- <objectgroup name="TestObject" width="10" height="10">
+ <objectgroup name="TestObject">
   <properties>
    <property name="objectlayerprop" value="666"/>
   </properties>
-  <object x="7" y="11" width="51" height="51">
+  <object id="1" x="7" y="11" width="51" height="51">
    <properties>
     <property name="asquare" value="test"/>
    </properties>
   </object>
-  <object x="93" y="-8" width="89" height="154">
+  <object id="2" x="93" y="-8" width="89" height="154">
    <properties>
     <property name="acircle" value="test"/>
    </properties>
    <ellipse/>
   </object>
-  <object x="106" y="81">
+  <object id="3" x="106" y="81">
    <properties>
     <property name="example_poly" value="111"/>
    </properties>
    <polygon points="0,0 147,-21 110,-118 -77,-85 -136,92 -34,189 111,86 1,401 -355,137 -266,-87 -228,-145 -72,-170 103,-156 149,-137 702,101"/>
   </object>
-  <object x="111" y="270">
+  <object id="4" x="111" y="270">
    <properties>
     <property name="lines" value="test"/>
    </properties>
    <polyline points="0,0 125,-38 150,-133 220,-178 383,-111 339,4 142,52"/>
   </object>
  </objectgroup>
- <objectgroup name="TestObject2" width="10" height="10"/>
+ <objectgroup name="TestObject2"/>
 </map>

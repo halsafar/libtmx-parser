@@ -214,7 +214,7 @@ typedef struct
  * @param outMap
  * @return
  */
-TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap);
+TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap, const std::string& tilesetPath);
 
 
 /**
@@ -224,7 +224,7 @@ TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap);
  * @param outMap
  * @return
  */
-TmxReturn parseFromMemory(void* data, size_t length, TmxMap* outMap);
+TmxReturn parseFromMemory(void* data, size_t length, TmxMap* outMap, const std::string& tilesetPath);
 
 
 }

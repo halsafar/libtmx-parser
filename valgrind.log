@@ -1,0 +1,16 @@
+==12411== Memcheck, a memory error detector
+==12411== Copyright (C) 2002-2013, and GNU GPL'd, by Julian Seward et al.
+==12411== Using Valgrind-3.10.0.SVN and LibVEX; rerun with -h for copyright info
+==12411== Command: ./tmxparse_test
+==12411== 
+W/"libtmxparser"()Missing Attribute [trans]
+W/"libtmxparser"()Missing Attribute [trans]
+==12411== 
+==12411== HEAP SUMMARY:
+==12411==     in use at exit: 0 bytes in 0 blocks
+==12411==   total heap usage: 50 allocs, 50 frees, 73,661 bytes allocated
+==12411== 
+==12411== All heap blocks were freed -- no leaks are possible
+==12411== 
+==12411== For counts of detected and suppressed errors, rerun with: -v
+==12411== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

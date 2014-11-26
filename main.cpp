@@ -182,7 +182,7 @@ int main()
 	tmxparser::TmxMap map;
 
 	// test from file
-	error = tmxparser::parseFromFile("example.tmx", &map);
+	error = tmxparser::parseFromFile("example.tmx", &map, "test/textures/");
 
 	// test from memory
 	/*FILE* fp;

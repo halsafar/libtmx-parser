@@ -63,7 +63,7 @@
 #endif
 
 
-#define CHECK_AND_RETRIEVE_ATTRIBUTE_STRING(XMLELEMENT, ATTRIBNAME, LHS) \
+#define CHECK_AND_RETRIEVE_OPT_ATTRIBUTE_STRING(XMLELEMENT, ATTRIBNAME, LHS) \
 	if (XMLELEMENT->Attribute(ATTRIBNAME) != NULL) \
 	{ \
 		LHS = XMLELEMENT->Attribute(ATTRIBNAME); \
@@ -71,6 +71,7 @@
 	else \
 	{ \
 		LOGW("Missing Attribute [%s]", ATTRIBNAME); \
+		LHS = "FOO"; \
 	}
 
 
@@ -155,7 +156,8 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 	outMap->height = element->UnsignedAttribute("height");
 	outMap->tileWidth = element->UnsignedAttribute("tilewidth");
 	outMap->tileHeight = element->UnsignedAttribute("tileheight");
-	outMap->backgroundColor = element->Attribute("backgroundcolor");
+	CHECK_AND_RETRIEVE_OPT_ATTRIBUTE_STRING(element, "backgroundcolor", outMap->backgroundColor);
+	//outMap->backgroundColor = element->Attribute("backgroundcolor");
 
 	TmxReturn error = _parsePropertyNode(element->FirstChildElement("properties"), &outMap->propertyMap);
 	if (error)
@@ -241,14 +243,14 @@ TmxReturn _parsePropertyNode(tinyxml2::XMLElement* element, TmxPropertyMap_t* ou
 
 TmxReturn _parseImageNode(tinyxml2::XMLElement* element, TmxImage* outImage)
 {
-	CHECK_AND_RETRIEVE_ATTRIBUTE_STRING(element, "source", outImage->source);
+	CHECK_AND_RETRIEVE_OPT_ATTRIBUTE_STRING(element, "source", outImage->source);
 
 	if (element->Attribute("format") != NULL)
 	{
 		outImage->format = element->Attribute("format");
 	}
 
-	CHECK_AND_RETRIEVE_ATTRIBUTE_STRING(element, "trans", outImage->transparentColor);
+	CHECK_AND_RETRIEVE_OPT_ATTRIBUTE_STRING(element, "trans", outImage->transparentColor);
 
 	//retVal.transparentColor = element->Attribute("trans");
 	outImage->width = element->UnsignedAttribute("width");

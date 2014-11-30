@@ -126,7 +126,7 @@ TmxReturn parseFromMemory(void* data, size_t length, TmxMap* outMap, const std::
 TmxReturn _parseStart(tinyxml2::XMLElement* element, TmxMap* outMap, const std::string& tilesetPath)
 {
 	TmxReturn retVal = _parseMapNode(element, outMap);
-	return _parseEnd(outMap, tilesetPath);
+	return (retVal == TmxReturn::kSuccess) ? _parseEnd(outMap, tilesetPath) : retVal;
 }
 
 
@@ -155,7 +155,7 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 	outMap->height = element->UnsignedAttribute("height");
 	outMap->tileWidth = element->UnsignedAttribute("tilewidth");
 	outMap->tileHeight = element->UnsignedAttribute("tileheight");
-	outMap->backgroundColor = element->Attribute("backgroundcolor") || "";
+	outMap->backgroundColor = element->Attribute("backgroundcolor");
 
 	TmxReturn error = _parsePropertyNode(element->FirstChildElement("properties"), &outMap->propertyMap);
 	if (error)

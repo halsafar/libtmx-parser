@@ -372,33 +372,57 @@ TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTileset
 	outTile->gid = element->UnsignedAttribute("gid");
 
 	outTile->tilesetIndex = 0;
-	outTile->tileInTilesetIndex = 0;
+	outTile->flatIndexInTileset = 0;
+	outTile->cellXIndex = 0;
+	outTile->cellYIndex = 0;
 
 	// search for layerindex
 	// O(n) where n = number of tilesets
 	// Generally n will never be high but this method is called from an O(m) method.
-	unsigned int index = 0;
-	//unsigned int lastStartIndex = 0;
-	unsigned int lastEndIndex = 1;
-	for (auto it = tilesets.begin(); it != tilesets.end(); ++it)
+	if (outTile->gid != 0)
 	{
-		unsigned int startIndex = it->firstgid;
-		unsigned int endIndex = it->firstgid + ( (it->image.width / it->tileWidth) * (it->image.height / it->tileHeight) );
-
-		if (outTile->gid >= startIndex && outTile->gid < endIndex)
+		unsigned int index = 0;
+		unsigned int lastEndIndex = 1;
+		for (auto it = tilesets.begin(); it != tilesets.end(); ++it)
 		{
-			outTile->tilesetIndex = index;
+			unsigned int colCount = (it->image.width / it->tileWidth);
+			unsigned int rowCount = (it->image.height / it->tileHeight);
+			unsigned int startIndex = it->firstgid;
+			unsigned int endIndex = it->firstgid + ( colCount * rowCount );
 
-			outTile->tileInTilesetIndex = (outTile->gid) - lastEndIndex;
+			if (outTile->gid >= startIndex && outTile->gid < endIndex)
+			{
+				outTile->tilesetIndex = index;
+				outTile->flatIndexInTileset = (outTile->gid) - lastEndIndex;
 
-			return error;
+				// convert flat index to 2D
+				outTile->cellXIndex = outTile->flatIndexInTileset % colCount;
+				outTile->cellYIndex = outTile->flatIndexInTileset / colCount;
+
+				// done
+				break;
+			}
+
+			lastEndIndex = endIndex;
+
+			index++;
 		}
-
-		//lastStartIndex = startIndex;
-		lastEndIndex = endIndex;
-
-		index++;
 	}
+	/*
+	for (auto layerIt = map->layerCollection.begin(); layerIt != map->layerCollection.end(); ++layerIt)
+	{
+		for (auto tileIt = layerIt->tiles.begin(); tileIt != layerIt->tiles.end(); ++tileIt)
+		{
+			// get uv coords
+			tmxparser::TmxTileset tileset = map->tilesetCollection[tileIt->tilesetIndex];
+			int rows = tileset.image.height / tileset.tileHeight;
+			int cols = tileset.image.width / tileset.tileWidth;
+
+			float u = tileIt->tileInTilesetIndex % cols;
+			float y = tileIt->tileInTilesetIndex / cols;
+		}
+	}
+	 */
 
 	return error;
 }

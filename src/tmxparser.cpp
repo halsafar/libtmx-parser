@@ -408,21 +408,6 @@ TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTileset
 			index++;
 		}
 	}
-	/*
-	for (auto layerIt = map->layerCollection.begin(); layerIt != map->layerCollection.end(); ++layerIt)
-	{
-		for (auto tileIt = layerIt->tiles.begin(); tileIt != layerIt->tiles.end(); ++tileIt)
-		{
-			// get uv coords
-			tmxparser::TmxTileset tileset = map->tilesetCollection[tileIt->tilesetIndex];
-			int rows = tileset.image.height / tileset.tileHeight;
-			int cols = tileset.image.width / tileset.tileWidth;
-
-			float u = tileIt->tileInTilesetIndex % cols;
-			float y = tileIt->tileInTilesetIndex / cols;
-		}
-	}
-	 */
 
 	return error;
 }

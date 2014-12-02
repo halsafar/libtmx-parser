@@ -202,6 +202,7 @@ typedef struct
 	unsigned int tileWidth;
 	unsigned int tileHeight;
 	std::string backgroundColor;
+	std::string renderOrder;
 	TmxPropertyMap_t propertyMap;
 	TmxTilesetCollection_t tilesetCollection;
 	TmxLayerCollection_t layerCollection;

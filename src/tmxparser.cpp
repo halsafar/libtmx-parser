@@ -66,6 +66,10 @@
 #endif
 
 
+namespace tmxparser
+{
+
+
 #define CHECK_AND_RETRIEVE_OPT_ATTRIBUTE_STRING(XMLELEMENT, ATTRIBNAME, LHS) \
 	if (XMLELEMENT->Attribute(ATTRIBNAME) != NULL) \
 	{ \
@@ -73,13 +77,19 @@
 	} \
 	else \
 	{ \
-		LOGW("Missing Attribute [%s]", ATTRIBNAME); \
-		LHS = "FOO"; \
+		LHS = '\0'; \
 	}
 
 
-namespace tmxparser
-{
+#define CHECK_AND_RETRIEVE_REQ_ATTRIBUTE_STRING(XMLELEMENT, ATTRIBNAME, LHS) \
+	if (XMLELEMENT->Attribute(ATTRIBNAME) != NULL) \
+	{ \
+		LHS = XMLELEMENT->Attribute(ATTRIBNAME); \
+	} \
+	else \
+	{ \
+		return TmxReturn::kErrorParsing; \
+	}
 
 
 // Prototypes
@@ -161,7 +171,8 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 	outMap->tileWidth = element->UnsignedAttribute("tilewidth");
 	outMap->tileHeight = element->UnsignedAttribute("tileheight");
 	CHECK_AND_RETRIEVE_OPT_ATTRIBUTE_STRING(element, "backgroundcolor", outMap->backgroundColor);
-	//outMap->backgroundColor = element->Attribute("backgroundcolor");
+	CHECK_AND_RETRIEVE_OPT_ATTRIBUTE_STRING(element, "renderorder", outMap->renderOrder);
+
 
 	TmxReturn error = _parsePropertyNode(element->FirstChildElement("properties"), &outMap->propertyMap);
 	if (error)

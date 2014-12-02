@@ -81,9 +81,9 @@ void printLayerTiles(int depth, const tmxparser::TmxLayerTileCollection_t& colle
 
 		printf_depth(nextdepth, "Gid: %u", it->gid);
 		printf_depth(nextdepth, "tilesetIndex: %u", it->tilesetIndex);
-		printf_depth(nextdepth, "flatIndexInTileset: %u", it->flatIndexInTileset);
-		printf_depth(nextdepth, "cellXIndex: %u", it->cellXIndex);
-		printf_depth(nextdepth, "cellYIndex: %u", it->cellYIndex);
+		printf_depth(nextdepth, "tileFlatIndex: %u", it->tileFlatIndex);
+		printf_depth(nextdepth, "tileXIndex: %u", it->tileXIndex);
+		printf_depth(nextdepth, "tileYIndex: %u", it->tileYIndex);
 	}
 }
 
@@ -184,7 +184,7 @@ int main()
 	tmxparser::TmxMap map;
 
 	// test from file
-	error = tmxparser::parseFromFile("example.tmx", &map, "test/textures/");
+	error = tmxparser::parseFromFile("test_base64_level.tmx", &map, "test/textures/");
 
 	// test from memory
 	/*FILE* fp;

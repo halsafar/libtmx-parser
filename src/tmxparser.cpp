@@ -1,6 +1,8 @@
 
 #include "tmxparser.h"
 
+#include "base64.h"
+
 
 #if (defined(_WIN32))
      #include <string.h>
@@ -14,6 +16,7 @@
 	#include <cstdio>
 #endif
 
+#include <algorithm>
 #include <string>
 #include <sstream>
 
@@ -348,6 +351,13 @@ TmxReturn _parseLayerDataNode(tinyxml2::XMLElement* element, const TmxTilesetCol
 	TmxReturn error = TmxReturn::kSuccess;
 
 	const char* encoding = element->Attribute("encoding");
+	const char* compression = element->Attribute("compression");
+
+	if (compression != NULL)
+	{
+		LOGE("Does not support compression yet...");
+		return TmxReturn::kErrorParsing;
+	}
 
 	if (encoding == NULL)
 	{
@@ -375,7 +385,36 @@ TmxReturn _parseLayerDataNode(tinyxml2::XMLElement* element, const TmxTilesetCol
 
 			tile.gid = gid;
 			error = _calculateTileIndices(tilesets, &tile);
-			if (error == tmxparser::kErrorParsing)
+			if (error == TmxReturn::kErrorParsing)
+			{
+				return error;
+			}
+
+			outTileCollection->push_back(tile);
+		}
+	}
+	else if (strcmp(encoding, "base64") == 0)
+	{
+		std::string csvbase64 = element->FirstChild()->Value();
+
+		csvbase64.erase(std::remove(csvbase64.begin(), csvbase64.end(), '\n'), csvbase64.end());
+		csvbase64.erase(std::remove(csvbase64.begin(), csvbase64.end(), '\r'), csvbase64.end());
+		csvbase64.erase(std::remove(csvbase64.begin(), csvbase64.end(), ' '), csvbase64.end());
+
+		std::string csv = base64_decode(csvbase64);
+
+
+		unsigned int length = csv.size() / sizeof(unsigned int);
+
+		// tiled base64 layer data is an unsigned 32bit array little endian
+		// TODO - verify this on other platforms, write some tests
+		unsigned int* p = (unsigned int*)csv.c_str();
+		for (unsigned int i = 0; i < length; i++)
+		{
+			TmxLayerTile tile;
+			tile.gid = p[i];
+			error = _calculateTileIndices(tilesets, &tile);
+			if (error == TmxReturn::kErrorParsing)
 			{
 				return error;
 			}
@@ -385,7 +424,7 @@ TmxReturn _parseLayerDataNode(tinyxml2::XMLElement* element, const TmxTilesetCol
 	}
 	else
 	{
-		LOGE("Unsupported layer compression... coming soon...");
+		LOGE("Unsupported layer compression [%s]... coming soon...", encoding);
 		return TmxReturn::kErrorParsing;
 	}
 
@@ -435,7 +474,7 @@ TmxReturn _calculateTileIndices(const TmxTilesetCollection_t& tilesets, TmxLayer
 				outTile->tileYIndex = outTile->tileFlatIndex / colCount;
 
 				// done
-				return tmxparser::kSuccess;
+				return TmxReturn::kSuccess;
 			}
 
 			lastEndIndex = endIndex;
@@ -444,7 +483,7 @@ TmxReturn _calculateTileIndices(const TmxTilesetCollection_t& tilesets, TmxLayer
 		}
 	}
 
-	return tmxparser::kSuccess;
+	return TmxReturn::kSuccess;
 }
 
 

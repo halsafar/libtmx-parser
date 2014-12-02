@@ -94,6 +94,19 @@ TEST_F(TmxParseTest, TilesetImageSourceProperties)
 }
 
 
+TEST_F(TmxParseTest, LayerProperties)
+{
+	ASSERT_EQ(1, _map->layerCollection.size());
+	tmxparser::TmxLayer layer = _map->layerCollection[0];
+
+	ASSERT_EQ("World", layer.name);
+	ASSERT_EQ(16, layer.width);
+	ASSERT_EQ(16, layer.height);
+
+	ASSERT_EQ(256, layer.tiles.size());
+}
+
+
 int main(int argc, char **argv)
 {
 	::testing::InitGoogleTest(&argc, argv);

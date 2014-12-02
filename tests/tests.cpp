@@ -23,7 +23,12 @@ protected:
 
 	}
 
-	// virtual void TearDown() {}
+
+	virtual void TearDown()
+	{
+
+	}
+
 
 	static tmxparser::TmxMap* _map;
 };
@@ -54,13 +59,38 @@ TEST_F(TmxParseTest, MapProperties)
 TEST_F(TmxParseTest, TilesetProperties)
 {
 	ASSERT_EQ(2, _map->tilesetCollection.size());
+
 	tmxparser::TmxTileset tileset = _map->tilesetCollection[0];
 	ASSERT_EQ(1, tileset.firstgid);
 	ASSERT_EQ("super_mario_one_tileset", tileset.name);
 	ASSERT_EQ(16, tileset.tileWidth);
 	ASSERT_EQ(16, tileset.tileHeight);
 
+	tileset = _map->tilesetCollection[1];
+	ASSERT_EQ(925, tileset.firstgid);
+	ASSERT_EQ("BowserBreath", tileset.name);
+	ASSERT_EQ(32, tileset.tileWidth);
+	ASSERT_EQ(32, tileset.tileHeight);
+}
 
+
+TEST_F(TmxParseTest, TilesetImageSourceProperties)
+{
+	ASSERT_EQ(2, _map->tilesetCollection.size());
+
+	tmxparser::TmxTileset tileset = _map->tilesetCollection[0];
+	tmxparser::TmxImage image = tileset.image;
+
+	ASSERT_EQ("assets/textures/super_mario_one_tileset.png", image.source);
+	ASSERT_EQ(528, image.width);
+	ASSERT_EQ(448, image.height);
+
+	tileset = _map->tilesetCollection[1];
+	image = tileset.image;
+
+	ASSERT_EQ("assets/textures/BowserBreath.png", image.source);
+	ASSERT_EQ(128, image.width);
+	ASSERT_EQ(32, image.height);
 }
 
 

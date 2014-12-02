@@ -132,9 +132,9 @@ typedef struct
 {
 	unsigned int gid;
 	unsigned int tilesetIndex;
-	unsigned int flatIndexInTileset;
-	unsigned int cellXIndex;
-	unsigned int cellYIndex;
+	unsigned int tileFlatIndex;
+	unsigned int tileXIndex;
+	unsigned int tileYIndex;
 } TmxLayerTile;
 
 

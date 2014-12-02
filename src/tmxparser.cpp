@@ -372,9 +372,9 @@ TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTileset
 	outTile->gid = element->UnsignedAttribute("gid");
 
 	outTile->tilesetIndex = 0;
-	outTile->flatIndexInTileset = 0;
-	outTile->cellXIndex = 0;
-	outTile->cellYIndex = 0;
+	outTile->tileFlatIndex = 0;
+	outTile->tileXIndex = 0;
+	outTile->tileYIndex = 0;
 
 	// search for layerindex
 	// O(n) where n = number of tilesets
@@ -393,11 +393,11 @@ TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTileset
 			if (outTile->gid >= startIndex && outTile->gid < endIndex)
 			{
 				outTile->tilesetIndex = index;
-				outTile->flatIndexInTileset = (outTile->gid) - lastEndIndex;
+				outTile->tileFlatIndex = (outTile->gid) - lastEndIndex;
 
 				// convert flat index to 2D
-				outTile->cellXIndex = outTile->flatIndexInTileset % colCount;
-				outTile->cellYIndex = outTile->flatIndexInTileset / colCount;
+				outTile->tileXIndex = outTile->tileFlatIndex % colCount;
+				outTile->tileYIndex = outTile->tileFlatIndex / colCount;
 
 				// done
 				break;

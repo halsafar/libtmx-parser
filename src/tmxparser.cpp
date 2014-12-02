@@ -90,6 +90,7 @@ TmxReturn _parseTileDefinitionNode(tinyxml2::XMLElement* element, TmxTileDefinit
 TmxReturn _parseLayerNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayer* outLayer);
 TmxReturn _parseLayerDataNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTileCollection_t* outTileCollection);
 TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTile* outTile);
+TmxReturn _calculateTileIndices(const TmxTilesetCollection_t& tilesets, TmxLayerTile* outTile);
 //TmxLayerTileCollection_t _parseLayerCsvDataNode(tinyxml2::XMLElement* element);
 //TmxLayerTileCollection_t _parseLayerBase64DataNode(tinyxml2::XMLElement* element);
 TmxReturn _parseObjectGroupNode(tinyxml2::XMLElement* element, TmxObjectGroup* outObjectGroup);
@@ -347,19 +348,47 @@ TmxReturn _parseLayerDataNode(tinyxml2::XMLElement* element, const TmxTilesetCol
 	TmxReturn error = TmxReturn::kSuccess;
 
 	const char* encoding = element->Attribute("encoding");
-	if (encoding != NULL)
+
+	if (encoding == NULL)
+	{
+		for (tinyxml2::XMLElement* child = element->FirstChildElement("tile"); child != NULL; child = child->NextSiblingElement("tile"))
+		{
+			TmxLayerTile tile;
+			error = _parseLayerXmlTileNode(child, tilesets, &tile);
+			outTileCollection->push_back(tile);
+		}
+	}
+	else if (strcmp(encoding, "csv") == 0)
+	{
+		std::stringstream csvss(element->FirstChild()->Value());
+		//LOGE("TEXT = %s", csv.c_str());
+
+		unsigned int gid = 0;
+		while (csvss >> gid)
+		{
+			if (csvss.peek() == ',' || csvss.peek() == '\n')
+			{
+				csvss.ignore();
+			}
+
+			TmxLayerTile tile;
+
+			tile.gid = gid;
+			error = _calculateTileIndices(tilesets, &tile);
+			if (error == tmxparser::kErrorParsing)
+			{
+				return error;
+			}
+
+			outTileCollection->push_back(tile);
+		}
+	}
+	else
 	{
 		LOGE("Unsupported layer compression... coming soon...");
-		error = TmxReturn::kErrorParsing;
-		return error;
+		return TmxReturn::kErrorParsing;
 	}
 
-	for (tinyxml2::XMLElement* child = element->FirstChildElement("tile"); child != NULL; child = child->NextSiblingElement("tile"))
-	{
-		TmxLayerTile tile;
-		error = _parseLayerXmlTileNode(child, tilesets, &tile);
-		outTileCollection->push_back(tile);
-	}
 	return error;
 }
 
@@ -371,6 +400,12 @@ TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTileset
 
 	outTile->gid = element->UnsignedAttribute("gid");
 
+	return _calculateTileIndices(tilesets, outTile);
+}
+
+
+TmxReturn _calculateTileIndices(const TmxTilesetCollection_t& tilesets, TmxLayerTile* outTile)
+{
 	outTile->tilesetIndex = 0;
 	outTile->tileFlatIndex = 0;
 	outTile->tileXIndex = 0;
@@ -400,7 +435,7 @@ TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTileset
 				outTile->tileYIndex = outTile->tileFlatIndex / colCount;
 
 				// done
-				break;
+				return tmxparser::kSuccess;
 			}
 
 			lastEndIndex = endIndex;
@@ -409,7 +444,7 @@ TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTileset
 		}
 	}
 
-	return error;
+	return tmxparser::kSuccess;
 }
 
 

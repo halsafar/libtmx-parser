@@ -184,7 +184,7 @@ int main()
 	tmxparser::TmxMap map;
 
 	// test from file
-	error = tmxparser::parseFromFile("test_base64_level.tmx", &map, "test/textures/");
+	error = tmxparser::parseFromFile("./test_files/test_base64_level.tmx", &map, "test/textures/");
 
 	// test from memory
 	/*FILE* fp;

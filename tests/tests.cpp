@@ -7,7 +7,7 @@ protected:
 	static void SetUpTestCase()
 	{
 		_map = new tmxparser::TmxMap();
-		tmxparser::parseFromFile("../test_xml_level.tmx", _map, "assets/textures/");
+		tmxparser::parseFromFile("../test_files/test_xml_level.tmx", _map, "assets/textures/");
 	}
 
 

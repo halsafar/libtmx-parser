@@ -124,6 +124,12 @@ TEST_F(TmxParseTest, TilesValidation)
 	{
 		ASSERT_EQ(expectedGidValues[i], tiles[i].gid);
 	}
+
+	int remaining = tiles.size() - testTileCount;
+	for (unsigned int i = testTileCount; i < remaining; i++)
+	{
+		ASSERT_EQ(0, tiles[i].gid);
+	}
 }
 
 

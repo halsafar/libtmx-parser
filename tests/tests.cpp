@@ -49,8 +49,8 @@ TEST_F(TmxParseTest, MapProperties)
 	ASSERT_EQ("1.0", _map->version);
 	ASSERT_EQ("orthogonal", _map->orientation);
 	ASSERT_EQ("right-down", _map->renderOrder);
-	ASSERT_EQ(16, _map->width);
-	ASSERT_EQ(16, _map->height);
+	ASSERT_EQ(10, _map->width);
+	ASSERT_EQ(10, _map->height);
 	ASSERT_EQ(16, _map->tileWidth);
 	ASSERT_EQ(16, _map->tileHeight);
 }
@@ -68,9 +68,9 @@ TEST_F(TmxParseTest, TilesetProperties)
 
 	tileset = _map->tilesetCollection[1];
 	ASSERT_EQ(925, tileset.firstgid);
-	ASSERT_EQ("BowserBreath", tileset.name);
-	ASSERT_EQ(32, tileset.tileWidth);
-	ASSERT_EQ(32, tileset.tileHeight);
+	ASSERT_EQ("legend_of_zelda_one_overworld_tiles", tileset.name);
+	ASSERT_EQ(16, tileset.tileWidth);
+	ASSERT_EQ(16, tileset.tileHeight);
 }
 
 
@@ -88,9 +88,9 @@ TEST_F(TmxParseTest, TilesetImageSourceProperties)
 	tileset = _map->tilesetCollection[1];
 	image = tileset.image;
 
-	ASSERT_EQ("assets/textures/BowserBreath.png", image.source);
-	ASSERT_EQ(128, image.width);
-	ASSERT_EQ(32, image.height);
+	ASSERT_EQ("assets/textures/legend_of_zelda_one_overworld_tiles.png", image.source);
+	ASSERT_EQ(307, image.width);
+	ASSERT_EQ(163, image.height);
 }
 
 
@@ -100,10 +100,10 @@ TEST_F(TmxParseTest, LayerProperties)
 	tmxparser::TmxLayer layer = _map->layerCollection[0];
 
 	ASSERT_EQ("World", layer.name);
-	ASSERT_EQ(16, layer.width);
-	ASSERT_EQ(16, layer.height);
+	ASSERT_EQ(10, layer.width);
+	ASSERT_EQ(10, layer.height);
 
-	ASSERT_EQ(256, layer.tiles.size());
+	ASSERT_EQ(100, layer.tiles.size());
 }
 
 

@@ -107,8 +107,40 @@ TEST_F(TmxParseTest, LayerProperties)
 }
 
 
+TEST_F(TmxParseTest, TilesValidation)
+{
+	ASSERT_EQ(1, _map->layerCollection.size());
+	tmxparser::TmxLayer layer = _map->layerCollection[0];
+
+	tmxparser::TmxLayerTileCollection_t tiles = layer.tiles;
+	ASSERT_EQ(100, tiles.size());
+
+	int expectedGidValues[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+							34, 35, 36, 37, 38, 39, 40, 41, 42, 43,
+							925, 926, 927, 928, 929, 930, 931, 932, 933, 934
+							};
+	int testTileCount = sizeof(expectedGidValues) / sizeof(int);
+	for (unsigned int i = 0; i < testTileCount; i++)
+	{
+		ASSERT_EQ(expectedGidValues[i], tiles[i].gid);
+	}
+}
+
+
 int main(int argc, char **argv)
 {
+	int retVal = 0;
+
 	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+
+	printf("\033[32m" "==========\nXML TESTS\n==========\n" "\033[0m");
+	retVal = RUN_ALL_TESTS();
+
+	//printf("\033[32m" "==========\nCSV TESTS\n==========\n" "\033[0m");
+	//retVal = RUN_ALL_TESTS();
+
+	//printf("\033[32m" "==========\nBASE64 TESTS\n==========\n" "\033[0m");
+	//retVal = RUN_ALL_TESTS();
+
+	return retVal;
 }

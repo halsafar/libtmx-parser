@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="16" tileheight="16" nextobjectid="11">
+ <tileset firstgid="1" name="super_mario_one_tileset" tilewidth="16" tileheight="16">
+  <image source="super_mario_one_tileset.png" width="528" height="448"/>
+ </tileset>
+ <tileset firstgid="925" name="legend_of_zelda_one_overworld_tiles" tilewidth="16" tileheight="16">
+  <image source="legend_of_zelda_one_overworld_tiles.png" width="307" height="163"/>
+ </tileset>
+ <layer name="World" width="10" height="10">
+  <data>
+   <tile gid="1"/>
+   <tile gid="2"/>
+   <tile gid="3"/>
+   <tile gid="4"/>
+   <tile gid="5"/>
+   <tile gid="6"/>
+   <tile gid="7"/>
+   <tile gid="8"/>
+   <tile gid="9"/>
+   <tile gid="10"/>
+   <tile gid="34"/>
+   <tile gid="35"/>
+   <tile gid="36"/>
+   <tile gid="37"/>
+   <tile gid="38"/>
+   <tile gid="39"/>
+   <tile gid="40"/>
+   <tile gid="41"/>
+   <tile gid="42"/>
+   <tile gid="43"/>
+   <tile gid="925"/>
+   <tile gid="926"/>
+   <tile gid="927"/>
+   <tile gid="928"/>
+   <tile gid="929"/>
+   <tile gid="930"/>
+   <tile gid="931"/>
+   <tile gid="932"/>
+   <tile gid="933"/>
+   <tile gid="934"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+  </data>
+ </layer>
+ <objectgroup name="Collision">
+  <object id="1" name="testRect" type="testRect" x="0" y="1" width="160" height="160"/>
+  <object id="2" name="testCircle" type="testType" x="48" y="83" width="73" height="73">
+   <ellipse/>
+  </object>
+  <object id="7" name="testPolygon" type="testPolygon" x="134" y="73">
+   <polygon points="0,0 8,59 -106,59 -79,-10"/>
+  </object>
+  <object id="9" name="testPolyline" type="testPolyline" x="15.5" y="69.5">
+   <polyline points="0,0 7,25.5 23.25,14.75 21,-6 1,-11.25 0.136364,0.318182"/>
+  </object>
+ </objectgroup>
+</map>

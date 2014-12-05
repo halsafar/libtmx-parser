@@ -557,8 +557,8 @@ TmxReturn _parseObjectNode(tinyxml2::XMLElement* element, TmxObject* outObj)
 	{
 		outObj->type = element->Attribute("type");
 	}
-	outObj->x = element->IntAttribute("x");
-	outObj->y = element->IntAttribute("y");
+	outObj->x = element->FloatAttribute("x");
+	outObj->y = element->FloatAttribute("y");
 	outObj->width = element->IntAttribute("width");
 	outObj->height = element->IntAttribute("height");
 	outObj->rotation = element->FloatAttribute("rotation");
@@ -603,13 +603,13 @@ TmxReturn _parseObjectNode(tinyxml2::XMLElement* element, TmxObject* outObj)
 		std::string pairToken;
 		while(std::getline(pairStringStream, pairToken, ' '))
 		{
-			std::pair<int, int> pair;
+			TmxShapePoint pair;
 			std::istringstream pointStringString(pairToken);
 			std::string pointToken;
 			std::getline(pointStringString, pointToken, ',');
-			pair.first = atoi(pointToken.c_str());
+			pair.first = atof(pointToken.c_str());
 			std::getline(pointStringString, pointToken, ',');
-			pair.second = atoi(pointToken.c_str());
+			pair.second = atof(pointToken.c_str());
 
 			outObj->shapePoints.push_back(pair);
 		}

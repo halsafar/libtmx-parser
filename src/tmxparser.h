@@ -156,15 +156,18 @@ typedef struct
 typedef std::vector<TmxLayer> TmxLayerCollection_t;
 
 
-typedef std::vector<std::pair<int, int> > TmxShapePointCollection_t;
+typedef std::pair<float, float> TmxShapePoint;
+
+
+typedef std::vector<TmxShapePoint> TmxShapePointCollection_t;
 
 
 typedef struct
 {
 	std::string name;
 	std::string type;
-	int x;
-	int y;
+	float x;
+	float y;
 	unsigned int width;
 	unsigned int height;
 	float rotation;

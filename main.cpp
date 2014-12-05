@@ -117,8 +117,8 @@ void printObjects(int depth, const tmxparser::TmxObjectCollection_t& collection)
 
 		printf_depth(nextdepth, "Name: %s", it->name.c_str());
 		printf_depth(nextdepth, "Type: %s", it->type.c_str());
-		printf_depth(nextdepth, "x: %d", it->x);
-		printf_depth(nextdepth, "x: %d", it->y);
+		printf_depth(nextdepth, "x: %f", it->x);
+		printf_depth(nextdepth, "x: %f", it->y);
 		printf_depth(nextdepth, "width: %u", it->width);
 		printf_depth(nextdepth, "height: %u", it->height);
 		printf_depth(nextdepth, "rotation: %f", it->rotation);
@@ -132,7 +132,7 @@ void printObjects(int depth, const tmxparser::TmxObjectCollection_t& collection)
 		printf_depth(nextdepth, "%s", "<shape>");
 		for (auto pointIt = it->shapePoints.begin(); pointIt != it->shapePoints.end(); ++pointIt)
 		{
-			printf_depth(nextdepth+1, "(x, y)=%d,%d", pointIt->first, pointIt->second);
+			printf_depth(nextdepth+1, "(x, y)=%f,%f", pointIt->first, pointIt->second);
 		}
 	}
 }
@@ -184,7 +184,7 @@ int main()
 	tmxparser::TmxMap map;
 
 	// test from file
-	error = tmxparser::parseFromFile("test_base64_level.tmx", &map, "test/textures/");
+	error = tmxparser::parseFromFile("./test_files/test_xml_level.tmx", &map, "test/textures/");
 
 	// test from memory
 	/*FILE* fp;

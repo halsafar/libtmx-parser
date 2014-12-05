@@ -81,15 +81,12 @@ namespace tmxparser
 	}
 
 
-#define CHECK_AND_RETRIEVE_REQ_ATTRIBUTE_STRING(XMLELEMENT, ATTRIBNAME, LHS) \
-	if (XMLELEMENT->Attribute(ATTRIBNAME) != NULL) \
-	{ \
-		LHS = XMLELEMENT->Attribute(ATTRIBNAME); \
-	} \
-	else \
-	{ \
-		return TmxReturn::kErrorParsing; \
-	}
+#define CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(FUNC, NAME, OUT) \
+		if (FUNC(NAME, OUT) == tinyxml2::XML_NO_ATTRIBUTE) \
+		{ \
+			LOGE("Missing required attribute [%s]", NAME) \
+			return kMissingRequiredAttribute; \
+		}
 
 
 // Prototypes
@@ -109,6 +106,11 @@ TmxReturn _calculateTileIndices(const TmxTilesetCollection_t& tilesets, TmxLayer
 TmxReturn _parseObjectGroupNode(tinyxml2::XMLElement* element, TmxObjectGroup* outObjectGroup);
 TmxReturn _parseObjectNode(tinyxml2::XMLElement* element, TmxObject* outObj);
 
+
+TmxReturn queryUnsignedAttribute(tinyxml2::XMLElement* element, const std::string& name, unsigned int* out)
+{
+	return element->QueryUnsignedAttribute(name.c_str(), out) != tinyxml2::XML_NO_ATTRIBUTE ? TmxReturn::kSuccess : TmxReturn::kMissingRequiredAttribute;
+}
 
 
 TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap, const std::string& tilesetPath)
@@ -166,7 +168,10 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 
 	outMap->version = element->Attribute("version");
 	outMap->orientation = element->Attribute("orientation");
-	outMap->width = element->UnsignedAttribute("width");
+
+	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "width", &outMap->width);
+	//element->QueryUnsignedAttribute("width", &outMap->width);
+	//outMap->width = element->UnsignedAttribute("width");
 	outMap->height = element->UnsignedAttribute("height");
 	outMap->tileWidth = element->UnsignedAttribute("tilewidth");
 	outMap->tileHeight = element->UnsignedAttribute("tileheight");

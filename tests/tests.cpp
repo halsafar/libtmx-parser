@@ -231,7 +231,7 @@ int main(int argc, char **argv)
 	printf("\033[32m" "==========\nXML TESTS\n==========\n" "\033[0m");
 	TmxParseTest::LoadMap("../test_files/test_xml_level.tmx");
 	retVal = RUN_ALL_TESTS();
-/*
+
 	printf("\033[32m" "==========\nCSV TESTS\n==========\n" "\033[0m");
 	TmxParseTest::LoadMap("../test_files/test_csv_level.tmx");
 	retVal = !retVal && RUN_ALL_TESTS();
@@ -239,6 +239,6 @@ int main(int argc, char **argv)
 	printf("\033[32m" "==========\nBASE64 TESTS\n==========\n" "\033[0m");
 	TmxParseTest::LoadMap("../test_files/test_base64_level.tmx");
 	retVal = !retVal && RUN_ALL_TESTS();
-*/
+
 	return retVal;
 }

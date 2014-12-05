@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="16" tileheight="16" nextobjectid="2">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="16" tileheight="16" nextobjectid="11">
  <tileset firstgid="1" name="super_mario_one_tileset" tilewidth="16" tileheight="16">
   <image source="super_mario_one_tileset.png" width="528" height="448"/>
  </tileset>
@@ -21,6 +21,15 @@
 </data>
  </layer>
  <objectgroup name="Collision">
-  <object id="1" x="0" y="1" width="160" height="160"/>
+  <object id="1" name="testRect" type="testRect" x="0" y="1" width="160" height="160"/>
+  <object id="2" name="testCircle" type="testType" x="48" y="83" width="73" height="73">
+   <ellipse/>
+  </object>
+  <object id="7" name="testPolygon" type="testPolygon" x="134" y="73">
+   <polygon points="0,0 8,59 -106,59 -79,-10"/>
+  </object>
+  <object id="9" name="testPolyline" type="testPolyline" x="15.5" y="69.5">
+   <polyline points="0,0 7,25.5 23.25,14.75 21,-6 1,-11.25 0.136364,0.318182"/>
+  </object>
  </objectgroup>
 </map>

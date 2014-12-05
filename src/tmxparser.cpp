@@ -1,3 +1,6 @@
+/**
+
+ */
 
 #include "tmxparser.h"
 
@@ -170,11 +173,10 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 	outMap->orientation = element->Attribute("orientation");
 
 	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "width", &outMap->width);
-	//element->QueryUnsignedAttribute("width", &outMap->width);
-	//outMap->width = element->UnsignedAttribute("width");
-	outMap->height = element->UnsignedAttribute("height");
-	outMap->tileWidth = element->UnsignedAttribute("tilewidth");
-	outMap->tileHeight = element->UnsignedAttribute("tileheight");
+	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "height", &outMap->height);
+	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "tilewidth", &outMap->tileWidth);
+	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "tileheight", &outMap->tileHeight);
+
 	CHECK_AND_RETRIEVE_OPT_ATTRIBUTE_STRING(element, "backgroundcolor", outMap->backgroundColor);
 	CHECK_AND_RETRIEVE_OPT_ATTRIBUTE_STRING(element, "renderorder", outMap->renderOrder);
 
@@ -188,7 +190,6 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 
 	for (tinyxml2::XMLElement* child = element->FirstChildElement("tileset"); child != NULL; child = child->NextSiblingElement("tileset"))
 	{
-		// TODO - pointer it all up?
 		TmxTileset set;
 		error = _parseTilesetNode(child, &set);
 		if (error)
@@ -219,7 +220,7 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 		error = _parseObjectGroupNode(child, &group);
 		if (error)
 		{
-			LOGE("Error processing layer node...");
+			LOGE("Error processing objectgroup node...");
 			return error;
 		}
 

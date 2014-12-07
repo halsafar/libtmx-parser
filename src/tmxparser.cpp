@@ -275,8 +275,6 @@ TmxReturn _parsePropertyNode(tinyxml2::XMLElement* element, TmxPropertyMap_t* ou
 	{
 		if (strcmp(child->Name(), "property") == 0)
 		{
-			LOGD("NAME:%s", child->Attribute("name"));
-			LOGD("VALUE:%s", child->Attribute("value"));
 			if (child->Attribute("name") != NULL && child->Attribute("value") != NULL)
 			{
 				(*outPropertyMap)[child->Attribute("name")] = child->Attribute("value");

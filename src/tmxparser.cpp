@@ -263,11 +263,9 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 
 TmxReturn _parsePropertyNode(tinyxml2::XMLElement* element, TmxPropertyMap_t* outPropertyMap)
 {
-	//LOGD("_parsePropertyNode(%p, %p)", element, outPropertyMap);
 	if (element == NULL)
 	{
 		// ignore this, not everything requires properties
-
 		return TmxReturn::kSuccess;
 	}
 

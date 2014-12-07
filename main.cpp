@@ -204,6 +204,10 @@ int main()
 	{
 		printTmxMapData(&map);
 	}
+	else
+	{
+		printf("error parsing file");
+	}
 
 	return error;
 }

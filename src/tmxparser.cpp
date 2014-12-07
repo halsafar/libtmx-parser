@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+
 #include "tmxparser.h"
 
 #include "base64.h"
@@ -105,14 +106,20 @@ namespace tmxparser
 
 
 #define CHECK_AND_RETRIEVE_REQ_ATTRIBUTE_STRING(XMLELEMENT, ATTRIBNAME, LHS) \
-	if (XMLELEMENT->Attribute(ATTRIBNAME) != NULL) \
+	LHS = XMLELEMENT->Attribute(ATTRIBNAME); \
+	if (LHS.size() == 0) \
 	{ \
-		LHS = XMLELEMENT->Attribute(ATTRIBNAME); \
-	} \
-	else \
-	{ \
-		return TmxReturn::kErrorParsing; \
+		LOGE("Missing required attribute [%s]", ATTRIBNAME) \
+		return TmxReturn::kMissingRequiredAttribute; \
 	}
+
+
+#define CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(FUNC, ATTRIBNAME, OUT) \
+		if (FUNC(ATTRIBNAME, OUT) == tinyxml2::XML_NO_ATTRIBUTE) \
+		{ \
+			LOGE("Missing required attribute [%s]", ATTRIBNAME) \
+			return kMissingRequiredAttribute; \
+		}
 
 
 // Prototypes
@@ -132,6 +139,11 @@ TmxReturn _calculateTileIndices(const TmxTilesetCollection_t& tilesets, TmxLayer
 TmxReturn _parseObjectGroupNode(tinyxml2::XMLElement* element, TmxObjectGroup* outObjectGroup);
 TmxReturn _parseObjectNode(tinyxml2::XMLElement* element, TmxObject* outObj);
 
+
+TmxReturn queryUnsignedAttribute(tinyxml2::XMLElement* element, const std::string& name, unsigned int* out)
+{
+	return element->QueryUnsignedAttribute(name.c_str(), out) != tinyxml2::XML_NO_ATTRIBUTE ? TmxReturn::kSuccess : TmxReturn::kMissingRequiredAttribute;
+}
 
 
 TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap, const std::string& tilesetPath)
@@ -189,10 +201,12 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 
 	outMap->version = element->Attribute("version");
 	outMap->orientation = element->Attribute("orientation");
-	outMap->width = element->UnsignedAttribute("width");
-	outMap->height = element->UnsignedAttribute("height");
-	outMap->tileWidth = element->UnsignedAttribute("tilewidth");
-	outMap->tileHeight = element->UnsignedAttribute("tileheight");
+
+	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "width", &outMap->width);
+	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "height", &outMap->height);
+	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "tilewidth", &outMap->tileWidth);
+	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "tileheight", &outMap->tileHeight);
+
 	CHECK_AND_RETRIEVE_OPT_ATTRIBUTE_STRING(element, "backgroundcolor", outMap->backgroundColor);
 	CHECK_AND_RETRIEVE_OPT_ATTRIBUTE_STRING(element, "renderorder", outMap->renderOrder);
 
@@ -206,7 +220,6 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 
 	for (tinyxml2::XMLElement* child = element->FirstChildElement("tileset"); child != NULL; child = child->NextSiblingElement("tileset"))
 	{
-		// TODO - pointer it all up?
 		TmxTileset set;
 		error = _parseTilesetNode(child, &set);
 		if (error)
@@ -237,7 +250,7 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 		error = _parseObjectGroupNode(child, &group);
 		if (error)
 		{
-			LOGE("Error processing layer node...");
+			LOGE("Error processing objectgroup node...");
 			return error;
 		}
 
@@ -281,16 +294,10 @@ TmxReturn _parsePropertyNode(tinyxml2::XMLElement* element, TmxPropertyMap_t* ou
 
 TmxReturn _parseImageNode(tinyxml2::XMLElement* element, TmxImage* outImage)
 {
-	CHECK_AND_RETRIEVE_OPT_ATTRIBUTE_STRING(element, "source", outImage->source);
-
-	if (element->Attribute("format") != NULL)
-	{
-		outImage->format = element->Attribute("format");
-	}
-
+	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE_STRING(element, "source", outImage->source);
+	CHECK_AND_RETRIEVE_OPT_ATTRIBUTE_STRING(element, "format", outImage->format);
 	CHECK_AND_RETRIEVE_OPT_ATTRIBUTE_STRING(element, "trans", outImage->transparentColor);
 
-	//retVal.transparentColor = element->Attribute("trans");
 	outImage->width = element->UnsignedAttribute("width");
 	outImage->height = element->UnsignedAttribute("height");
 
@@ -303,10 +310,10 @@ TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTilese
 
 	if (strcmp(element->Name(), "tileset") == 0)
 	{
-		outTileset->firstgid = element->UnsignedAttribute("firstgid");
+		CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "firstgid", &outTileset->firstgid);
 		outTileset->name = element->Attribute("name");
-		outTileset->tileWidth = element->UnsignedAttribute("tilewidth");
-		outTileset->tileHeight = element->UnsignedAttribute("tileheight");
+		CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "tilewidth", &outTileset->tileWidth);
+		CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "tileheight", &outTileset->tileHeight);
 		outTileset->tileSpacingInImage = element->UnsignedAttribute("spacing");
 		outTileset->tileMarginInImage = element->UnsignedAttribute("margin");
 

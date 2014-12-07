@@ -105,10 +105,19 @@ namespace tmxparser
 	}
 
 
-#define CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(FUNC, NAME, OUT) \
-		if (FUNC(NAME, OUT) == tinyxml2::XML_NO_ATTRIBUTE) \
+#define CHECK_AND_RETRIEVE_REQ_ATTRIBUTE_STRING(XMLELEMENT, ATTRIBNAME, LHS) \
+	LHS = XMLELEMENT->Attribute(ATTRIBNAME); \
+	if (LHS.size() == 0) \
+	{ \
+		LOGE("Missing required attribute [%s]", ATTRIBNAME) \
+		return TmxReturn::kMissingRequiredAttribute; \
+	}
+
+
+#define CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(FUNC, ATTRIBNAME, OUT) \
+		if (FUNC(ATTRIBNAME, OUT) == tinyxml2::XML_NO_ATTRIBUTE) \
 		{ \
-			LOGE("Missing required attribute [%s]", NAME) \
+			LOGE("Missing required attribute [%s]", ATTRIBNAME) \
 			return kMissingRequiredAttribute; \
 		}
 
@@ -285,16 +294,10 @@ TmxReturn _parsePropertyNode(tinyxml2::XMLElement* element, TmxPropertyMap_t* ou
 
 TmxReturn _parseImageNode(tinyxml2::XMLElement* element, TmxImage* outImage)
 {
-	CHECK_AND_RETRIEVE_OPT_ATTRIBUTE_STRING(element, "source", outImage->source);
-
-	if (element->Attribute("format") != NULL)
-	{
-		outImage->format = element->Attribute("format");
-	}
-
+	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE_STRING(element, "source", outImage->source);
+	CHECK_AND_RETRIEVE_OPT_ATTRIBUTE_STRING(element, "format", outImage->format);
 	CHECK_AND_RETRIEVE_OPT_ATTRIBUTE_STRING(element, "trans", outImage->transparentColor);
 
-	//retVal.transparentColor = element->Attribute("trans");
 	outImage->width = element->UnsignedAttribute("width");
 	outImage->height = element->UnsignedAttribute("height");
 
@@ -307,10 +310,10 @@ TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTilese
 
 	if (strcmp(element->Name(), "tileset") == 0)
 	{
-		outTileset->firstgid = element->UnsignedAttribute("firstgid");
+		CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "firstgid", &outTileset->firstgid);
 		outTileset->name = element->Attribute("name");
-		outTileset->tileWidth = element->UnsignedAttribute("tilewidth");
-		outTileset->tileHeight = element->UnsignedAttribute("tileheight");
+		CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "tilewidth", &outTileset->tileWidth);
+		CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "tileheight", &outTileset->tileHeight);
 		outTileset->tileSpacingInImage = element->UnsignedAttribute("spacing");
 		outTileset->tileMarginInImage = element->UnsignedAttribute("margin");
 

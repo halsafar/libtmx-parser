@@ -2,6 +2,18 @@
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="16" tileheight="16" nextobjectid="11">
  <tileset firstgid="1" name="super_mario_one_tileset" tilewidth="16" tileheight="16">
   <image source="super_mario_one_tileset.png" width="528" height="448"/>
+  <tile id="3">
+   <objectgroup draworder="index">
+    <object id="0" x="3.18182" y="3.18182" width="3.63636" height="4.72727"/>
+   </objectgroup>
+  </tile>
+  <tile id="60">
+   <animation>
+    <frame tileid="258" duration="100"/>
+    <frame tileid="259" duration="100"/>
+    <frame tileid="260" duration="100"/>
+   </animation>
+  </tile>
  </tileset>
  <tileset firstgid="925" name="legend_of_zelda_one_overworld_tiles" tilewidth="16" tileheight="16">
   <image source="legend_of_zelda_one_overworld_tiles.png" width="307" height="163"/>
@@ -11,7 +23,7 @@
 1,2,3,4,5,6,7,8,9,10,
 34,35,36,37,38,39,40,41,42,43,
 925,926,927,928,929,930,931,932,933,934,
-0,0,0,0,0,0,0,0,0,0,
+61,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,

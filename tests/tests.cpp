@@ -141,8 +141,8 @@ TEST_F(TmxParseTest, TilesValidation)
 
 	int expectedGidValues[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
 							34, 35, 36, 37, 38, 39, 40, 41, 42, 43,
-							925, 926, 927, 928, 929, 930, 931, 932, 933, 934
-							};
+							925, 926, 927, 928, 929, 930, 931, 932, 933, 934,
+							61};
 	int testTileCount = sizeof(expectedGidValues) / sizeof(int);
 	for (unsigned int i = 0; i < testTileCount; i++)
 	{

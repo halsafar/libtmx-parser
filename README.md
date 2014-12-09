@@ -1,6 +1,5 @@
 # libtmx-parser
 
-
 ## Tested Operating Systems
 - Ubuntu 14.04
 - Android 2.2+/3.X/4.X

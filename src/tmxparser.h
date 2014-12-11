@@ -129,8 +129,8 @@ typedef struct
 	std::string type;
 	float x;
 	float y;
-	unsigned int width;
-	unsigned int height;
+	float width;
+	float height;
 	float rotation;
 	unsigned int referenceGid;
 	bool visible;

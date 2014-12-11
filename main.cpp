@@ -38,9 +38,9 @@ void printObjects(int depth, const tmxparser::TmxObjectCollection_t& collection)
 		printf_depth(nextdepth, "Name: %s", it->name.c_str());
 		printf_depth(nextdepth, "Type: %s", it->type.c_str());
 		printf_depth(nextdepth, "x: %f", it->x);
-		printf_depth(nextdepth, "x: %f", it->y);
-		printf_depth(nextdepth, "width: %u", it->width);
-		printf_depth(nextdepth, "height: %u", it->height);
+		printf_depth(nextdepth, "y: %f", it->y);
+		printf_depth(nextdepth, "width: %f", it->width);
+		printf_depth(nextdepth, "height: %f", it->height);
 		printf_depth(nextdepth, "rotation: %f", it->rotation);
 		printf_depth(nextdepth, "refGid: %u", it->referenceGid);
 		printf_depth(nextdepth, "visible: %u", it->visible);

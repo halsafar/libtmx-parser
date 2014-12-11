@@ -623,8 +623,8 @@ TmxReturn _parseObjectNode(tinyxml2::XMLElement* element, TmxObject* outObj)
 	}
 	outObj->x = element->FloatAttribute("x");
 	outObj->y = element->FloatAttribute("y");
-	outObj->width = element->IntAttribute("width");
-	outObj->height = element->IntAttribute("height");
+	outObj->width = element->FloatAttribute("width");
+	outObj->height = element->FloatAttribute("height");
 	outObj->rotation = element->FloatAttribute("rotation");
 	outObj->referenceGid = element->UnsignedAttribute("gid");
 	outObj->visible = element->BoolAttribute("visible");

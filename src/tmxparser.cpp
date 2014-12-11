@@ -314,6 +314,12 @@ TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTilese
 		outTileset->tileSpacingInImage = element->UnsignedAttribute("spacing");
 		outTileset->tileMarginInImage = element->UnsignedAttribute("margin");
 
+		if (element->FirstChildElement("image") == NULL)
+		{
+			LOGE("We do not support maps with tilesets that have no image associated currently...");
+			return kErrorParsing;
+		}
+
 		TmxImage image;
 		TmxReturn error = _parseImageNode(element->FirstChildElement("image"), &outTileset->image);
 		if (error)
@@ -333,6 +339,16 @@ TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTilese
 			}
 
 			outTileset->tileDefinitions[tileDef.id] = tileDef;
+		}
+
+		// calculate tile indices
+		unsigned int colCount = (outTileset->image.width / outTileset->tileWidth);
+		unsigned int rowCount = (outTileset->image.height / outTileset->tileHeight);
+		for (unsigned int i = 0; i < colCount * rowCount; i++)
+		{
+			outTileset->tileDefinitions[i].id = i;
+			outTileset->tileDefinitions[i].tileXIndex = i % colCount;
+			outTileset->tileDefinitions[i].tileYIndex = i / colCount;
 		}
 	}
 
@@ -522,10 +538,8 @@ TmxReturn _calculateTileIndices(const TmxTilesetCollection_t& tilesets, TmxLayer
 {
 	outTile->tilesetIndex = 0;
 	outTile->tileFlatIndex = 0;
-	outTile->tileXIndex = 0;
-	outTile->tileYIndex = 0;
 
-	// search for layerindex
+	// search for tilesetindex
 	// O(n) where n = number of tilesets
 	// Generally n will never be high but this method is called from an O(m) method.
 	if (outTile->gid != 0)
@@ -545,8 +559,8 @@ TmxReturn _calculateTileIndices(const TmxTilesetCollection_t& tilesets, TmxLayer
 				outTile->tileFlatIndex = (outTile->gid) - lastEndIndex;
 
 				// convert flat index to 2D
-				outTile->tileXIndex = outTile->tileFlatIndex % colCount;
-				outTile->tileYIndex = outTile->tileFlatIndex / colCount;
+				//outTile->tileXIndex = outTile->tileFlatIndex % colCount;
+				//outTile->tileYIndex = outTile->tileFlatIndex / colCount;
 
 				// done
 				return TmxReturn::kSuccess;

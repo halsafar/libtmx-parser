@@ -160,7 +160,8 @@ typedef std::vector<TmxObjectGroup> TmxObjectGroupCollection_t;
 typedef struct
 {
 	TileId_t id;
-
+	unsigned int tileXIndex;
+	unsigned int tileYIndex;
 	TmxPropertyMap_t propertyMap;
 	TmxAnimationFrameCollection_t animations;
 	TmxObjectGroupCollection_t objectgroups;
@@ -208,8 +209,6 @@ typedef struct
 	unsigned int gid;
 	unsigned int tilesetIndex;
 	unsigned int tileFlatIndex;
-	unsigned int tileXIndex;
-	unsigned int tileYIndex;
 } TmxLayerTile;
 
 

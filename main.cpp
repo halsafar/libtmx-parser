@@ -95,6 +95,8 @@ void printTileDefinition(int depth, const tmxparser::TmxTileDefinitionMap_t& map
 	{
 		printf_depth(depth, "%s", "<tile>");
 		printf_depth(depth+1, "Id: %u", it->second.id);
+		printf_depth(depth+1, "tileXIndex: %u", it->second.tileXIndex);
+		printf_depth(depth+1, "tileYIndex: %u", it->second.tileYIndex);
 		printProperties(depth+1, it->second.propertyMap);
 
 		// animations
@@ -142,8 +144,8 @@ void printLayerTiles(int depth, const tmxparser::TmxLayerTileCollection_t& colle
 		printf_depth(nextdepth, "Gid: %u", it->gid);
 		printf_depth(nextdepth, "tilesetIndex: %u", it->tilesetIndex);
 		printf_depth(nextdepth, "tileFlatIndex: %u", it->tileFlatIndex);
-		printf_depth(nextdepth, "tileXIndex: %u", it->tileXIndex);
-		printf_depth(nextdepth, "tileYIndex: %u", it->tileYIndex);
+		//printf_depth(nextdepth, "tileXIndex: %u", it->tileXIndex);
+		//printf_depth(nextdepth, "tileYIndex: %u", it->tileYIndex);
 	}
 }
 

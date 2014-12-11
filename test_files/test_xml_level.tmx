@@ -129,7 +129,11 @@
   </data>
  </layer>
  <objectgroup name="Collision">
-  <object id="1" name="testRect" type="testRect" x="0" y="1" width="160" height="160"/>
+  <object id="1" name="testRect" type="testRect" x="0" y="1" width="160" height="160">
+   <properties>
+    <property name="Test" value="1"/>
+   </properties>
+  </object>
   <object id="2" name="testCircle" type="testType" x="48" y="83" width="73" height="73">
    <ellipse/>
   </object>

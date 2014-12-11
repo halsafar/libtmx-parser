@@ -117,13 +117,53 @@ typedef struct
 typedef std::vector<TmxAnimationFrame> TmxAnimationFrameCollection_t;
 
 
+typedef std::pair<float, float> TmxShapePoint;
+
+
+typedef std::vector<TmxShapePoint> TmxShapePointCollection_t;
+
+
+typedef struct
+{
+	std::string name;
+	std::string type;
+	float x;
+	float y;
+	unsigned int width;
+	unsigned int height;
+	float rotation;
+	unsigned int referenceGid;
+	bool visible;
+	TmxPropertyMap_t propertyMap;
+	TmxShapeType shapeType;
+	TmxShapePointCollection_t shapePoints;
+} TmxObject;
+
+
+typedef std::vector<TmxObject> TmxObjectCollection_t;
+
+
+typedef struct
+{
+	std::string name;
+	std::string color;
+	float opacity;
+	bool visible;
+	TmxPropertyMap_t propertyMap;
+	TmxObjectCollection_t objects;
+} TmxObjectGroup;
+
+
+typedef std::vector<TmxObjectGroup> TmxObjectGroupCollection_t;
+
+
 typedef struct
 {
 	TileId_t id;
 
 	TmxPropertyMap_t propertyMap;
 	TmxAnimationFrameCollection_t animations;
-	// objectgroups
+	TmxObjectGroupCollection_t objectgroups;
 } TmxTileDefinition;
 
 
@@ -189,46 +229,6 @@ typedef struct
 
 
 typedef std::vector<TmxLayer> TmxLayerCollection_t;
-
-
-typedef std::pair<float, float> TmxShapePoint;
-
-
-typedef std::vector<TmxShapePoint> TmxShapePointCollection_t;
-
-
-typedef struct
-{
-	std::string name;
-	std::string type;
-	float x;
-	float y;
-	unsigned int width;
-	unsigned int height;
-	float rotation;
-	unsigned int referenceGid;
-	bool visible;
-	TmxPropertyMap_t propertyMap;
-	TmxShapeType shapeType;
-	TmxShapePointCollection_t shapePoints;
-} TmxObject;
-
-
-typedef std::vector<TmxObject> TmxObjectCollection_t;
-
-
-typedef struct
-{
-	std::string name;
-	std::string color;
-	float opacity;
-	bool visible;
-	TmxPropertyMap_t propertyMap;
-	TmxObjectCollection_t objects;
-} TmxObjectGroup;
-
-
-typedef std::vector<TmxObjectGroup> TmxObjectGroupCollection_t;
 
 
 typedef struct

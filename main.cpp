@@ -27,6 +27,55 @@ void printProperties(int depth, const tmxparser::TmxPropertyMap_t& map)
 }
 
 
+void printObjects(int depth, const tmxparser::TmxObjectCollection_t& collection)
+{
+	int nextdepth = depth + 1;
+
+	for (auto it = collection.begin(); it != collection.end(); ++it)
+	{
+		printf_depth(depth, "%s", "<object>");
+
+		printf_depth(nextdepth, "Name: %s", it->name.c_str());
+		printf_depth(nextdepth, "Type: %s", it->type.c_str());
+		printf_depth(nextdepth, "x: %f", it->x);
+		printf_depth(nextdepth, "x: %f", it->y);
+		printf_depth(nextdepth, "width: %u", it->width);
+		printf_depth(nextdepth, "height: %u", it->height);
+		printf_depth(nextdepth, "rotation: %f", it->rotation);
+		printf_depth(nextdepth, "refGid: %u", it->referenceGid);
+		printf_depth(nextdepth, "visible: %u", it->visible);
+
+		printProperties(nextdepth, it->propertyMap);
+
+		printf_depth(nextdepth, "ShapeType: %u", it->shapeType);
+
+		printf_depth(nextdepth, "%s", "<shape>");
+		for (auto pointIt = it->shapePoints.begin(); pointIt != it->shapePoints.end(); ++pointIt)
+		{
+			printf_depth(nextdepth+1, "(x, y)=%f,%f", pointIt->first, pointIt->second);
+		}
+	}
+}
+
+
+void printObjectGroups(int depth, const tmxparser::TmxObjectGroupCollection_t& collection)
+{
+	int nextdepth = depth +1;
+
+	for (auto it = collection.begin(); it != collection.end(); ++it)
+	{
+		printf_depth(depth, "%s", "<objectgroup>");
+
+		printf_depth(nextdepth, "Name: %s", it->name.c_str());
+		printf_depth(nextdepth, "Color: %s", it->color.c_str());
+		printf_depth(nextdepth, "Opacity: %f", it->opacity);
+		printf_depth(nextdepth, "Visible: %u", it->visible);
+		printProperties(nextdepth, it->propertyMap);
+		printObjects(nextdepth, it->objects);
+	}
+}
+
+
 void printImageData(int depth, const tmxparser::TmxImage& tmximage)
 {
 	printf_depth(depth, "%s", "<image>");
@@ -56,6 +105,8 @@ void printTileDefinition(int depth, const tmxparser::TmxTileDefinitionMap_t& map
 			printf_depth(depth, "<frame tileId=%u duration=%f>", animIt->tileId, animIt->duration);
 		}
 		depth-=2;
+
+		printObjectGroups(depth+1, it->second.objectgroups);
 	}
 }
 
@@ -112,55 +163,6 @@ void printLayers(int depth, const tmxparser::TmxLayerCollection_t& collection)
 		printf_depth(nextdepth, "Visible: %u", (*it).visible);
 		printProperties(nextdepth+1, it->propertyMap);
 		printLayerTiles(nextdepth+1, it->tiles);
-	}
-}
-
-
-void printObjects(int depth, const tmxparser::TmxObjectCollection_t& collection)
-{
-	int nextdepth = depth + 1;
-
-	for (auto it = collection.begin(); it != collection.end(); ++it)
-	{
-		printf_depth(depth, "%s", "<object>");
-
-		printf_depth(nextdepth, "Name: %s", it->name.c_str());
-		printf_depth(nextdepth, "Type: %s", it->type.c_str());
-		printf_depth(nextdepth, "x: %f", it->x);
-		printf_depth(nextdepth, "x: %f", it->y);
-		printf_depth(nextdepth, "width: %u", it->width);
-		printf_depth(nextdepth, "height: %u", it->height);
-		printf_depth(nextdepth, "rotation: %f", it->rotation);
-		printf_depth(nextdepth, "refGid: %u", it->referenceGid);
-		printf_depth(nextdepth, "visible: %u", it->visible);
-
-		printProperties(nextdepth, it->propertyMap);
-
-		printf_depth(nextdepth, "ShapeType: %u", it->shapeType);
-
-		printf_depth(nextdepth, "%s", "<shape>");
-		for (auto pointIt = it->shapePoints.begin(); pointIt != it->shapePoints.end(); ++pointIt)
-		{
-			printf_depth(nextdepth+1, "(x, y)=%f,%f", pointIt->first, pointIt->second);
-		}
-	}
-}
-
-
-void printObjectGroups(int depth, const tmxparser::TmxObjectGroupCollection_t& collection)
-{
-	int nextdepth = depth +1;
-
-	for (auto it = collection.begin(); it != collection.end(); ++it)
-	{
-		printf_depth(depth, "%s", "<objectgroup>");
-
-		printf_depth(nextdepth, "Name: %s", it->name.c_str());
-		printf_depth(nextdepth, "Color: %s", it->color.c_str());
-		printf_depth(nextdepth, "Opacity: %f", it->opacity);
-		printf_depth(nextdepth, "Visible: %u", it->visible);
-		printProperties(nextdepth, it->propertyMap);
-		printObjects(nextdepth, it->objects);
 	}
 }
 

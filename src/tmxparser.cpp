@@ -356,6 +356,19 @@ TmxReturn _parseTileDefinitionNode(tinyxml2::XMLElement* element, TmxTileDefinit
 		error = _parseTileAnimationNode(element->FirstChildElement("animation"), &outTileDefinition->animations);
 	}
 
+	for (tinyxml2::XMLElement* child = element->FirstChildElement("objectgroup"); child != NULL; child = child->NextSiblingElement("objectgroup"))
+	{
+		TmxObjectGroup group;
+		error = _parseObjectGroupNode(child, &group);
+		if (error)
+		{
+			LOGE("Error processing objectgroup node...");
+			return error;
+		}
+
+		outTileDefinition->objectgroups.push_back(group);
+	}
+
 	return error;
 }
 
@@ -553,7 +566,7 @@ TmxReturn _parseObjectGroupNode(tinyxml2::XMLElement* element, TmxObjectGroup* o
 {
 	TmxReturn error = TmxReturn::kSuccess;
 
-	outObjectGroup->name = element->Attribute("name");
+	CHECK_AND_RETRIEVE_OPT_ATTRIBUTE_STRING(element, "name", outObjectGroup->name);
 
 	if (element->Attribute("opacity") != NULL)
 	{

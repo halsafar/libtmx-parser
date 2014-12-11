@@ -15,7 +15,7 @@
     <object id="0" x="0" y="0" width="16" height="16"/>
    </objectgroup>
    <animation>
-    <frame tileid="60" duration="100"/>
+    <frame tileid="60" duration="298"/>
     <frame tileid="61" duration="100"/>
     <frame tileid="62" duration="100"/>
    </animation>

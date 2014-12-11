@@ -130,6 +130,7 @@ TmxReturn _parsePropertyNode(tinyxml2::XMLElement* element, TmxPropertyMap_t* ou
 TmxReturn _parseImageNode(tinyxml2::XMLElement* element, TmxImage* outImage);
 TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTileset);
 TmxReturn _parseTileDefinitionNode(tinyxml2::XMLElement* element, TmxTileDefinition* outTileDefinition);
+TmxReturn _parseTileAnimationNode(tinyxml2::XMLElement* element, TmxAnimationFrameCollection_t* outAnimationCollection);
 TmxReturn _parseLayerNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayer* outLayer);
 TmxReturn _parseLayerDataNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTileCollection_t* outTileCollection);
 TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTile* outTile);
@@ -345,8 +346,32 @@ TmxReturn _parseTileDefinitionNode(tinyxml2::XMLElement* element, TmxTileDefinit
 
 	outTileDefinition->id = element->UnsignedAttribute("id");
 	error = _parsePropertyNode(element->FirstChildElement("properties"), &outTileDefinition->propertyMap);
+	if (error)
+	{
+		return error;
+	}
+
+	if (element->FirstChildElement("animation") != NULL)
+	{
+		error = _parseTileAnimationNode(element->FirstChildElement("animation"), &outTileDefinition->animations);
+	}
 
 	return error;
+}
+
+
+TmxReturn _parseTileAnimationNode(tinyxml2::XMLElement* element, TmxAnimationFrameCollection_t* outAnimationCollection)
+{
+	for (tinyxml2::XMLElement* child = element->FirstChildElement("frame"); child != NULL; child = child->NextSiblingElement("frame"))
+	{
+		TmxAnimationFrame frame;
+		frame.duration = child->FloatAttribute("duration");
+		frame.tileId = child->UnsignedAttribute("id");
+
+		outAnimationCollection->push_back(frame);
+	}
+
+	return kSuccess;
 }
 
 

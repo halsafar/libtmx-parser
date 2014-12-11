@@ -47,6 +47,15 @@ void printTileDefinition(int depth, const tmxparser::TmxTileDefinitionMap_t& map
 		printf_depth(depth, "%s", "<tile>");
 		printf_depth(depth+1, "Id: %u", it->second.id);
 		printProperties(depth+1, it->second.propertyMap);
+
+		// animations
+		printf_depth(depth+1, "%s", "<animation>");
+		depth+=2;
+		for (auto animIt = it->second.animations.begin(); animIt != it->second.animations.end(); ++animIt)
+		{
+			printf_depth(depth, "<frame tileId=%u duration=%f>", animIt->tileId, animIt->duration);
+		}
+		depth-=2;
 	}
 }
 

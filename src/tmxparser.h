@@ -109,10 +109,20 @@ typedef struct
 
 typedef struct
 {
+	TileId_t tileId;
+	float duration;
+} TmxAnimationFrame;
+
+
+typedef std::vector<TmxAnimationFrame> TmxAnimationFrameCollection_t;
+
+
+typedef struct
+{
 	TileId_t id;
 
 	TmxPropertyMap_t propertyMap;
-	// animations
+	TmxAnimationFrameCollection_t animations;
 	// objectgroups
 } TmxTileDefinition;
 

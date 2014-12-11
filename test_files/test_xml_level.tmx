@@ -8,10 +8,16 @@
    </objectgroup>
   </tile>
   <tile id="60">
+   <properties>
+    <property name="Test" value="1"/>
+   </properties>
+   <objectgroup draworder="index">
+    <object id="0" x="0" y="0" width="16" height="16"/>
+   </objectgroup>
    <animation>
-    <frame tileid="258" duration="100"/>
-    <frame tileid="259" duration="100"/>
-    <frame tileid="260" duration="100"/>
+    <frame tileid="60" duration="100"/>
+    <frame tileid="61" duration="100"/>
+    <frame tileid="62" duration="100"/>
    </animation>
   </tile>
  </tileset>

@@ -331,7 +331,7 @@ TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTilese
 				return error;
 			}
 
-			outTileset->_tiles.push_back(tileDef);
+			outTileset->tileDefinitions[tileDef.id] = tileDef;
 		}
 	}
 

@@ -61,6 +61,9 @@ typedef std::map<std::string, std::string> TmxPropertyMap_t;
 #endif
 
 
+typedef unsigned int TileId_t;
+
+
 /**
  * Used to identify tmx file encoding type for data tags
  */
@@ -106,12 +109,15 @@ typedef struct
 
 typedef struct
 {
-	unsigned int id;
+	TileId_t id;
+
 	TmxPropertyMap_t propertyMap;
+	// animations
+	// objectgroups
 } TmxTileDefinition;
 
 
-typedef std::vector<TmxTileDefinition> TmxTileDefinitionCollection_t;
+typedef std::unordered_map<unsigned int, TmxTileDefinition> TmxTileDefinitionMap_t;
 
 
 typedef struct
@@ -140,7 +146,7 @@ typedef struct
 	unsigned int tileSpacingInImage;
 	unsigned int tileMarginInImage;
 	TmxImage image;
-	TmxTileDefinitionCollection_t _tiles;
+	TmxTileDefinitionMap_t tileDefinitions;
 } TmxTileset;
 
 

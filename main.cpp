@@ -40,13 +40,13 @@ void printImageData(int depth, const tmxparser::TmxImage& tmximage)
 }
 
 
-void printTileDefinition(int depth, const tmxparser::TmxTileDefinitionCollection_t& collection)
+void printTileDefinition(int depth, const tmxparser::TmxTileDefinitionMap_t& map)
 {
-	for (auto it = collection.begin(); it != collection.end(); ++it)
+	for (auto it = map.begin(); it != map.end(); ++it)
 	{
 		printf_depth(depth, "%s", "<tile>");
-		printf_depth(depth+1, "Id: %u", it->id);
-		printProperties(depth+1, it->propertyMap);
+		printf_depth(depth+1, "Id: %u", it->second.id);
+		printProperties(depth+1, it->second.propertyMap);
 	}
 }
 
@@ -66,7 +66,7 @@ void printTilesets(int depth, const tmxparser::TmxTilesetCollection_t& collectio
 		printf_depth(nextdepth, "MarginImage: %u", (*it).tileMarginInImage);
 		printf_depth(nextdepth, "SpaceImage: %u", (*it).tileSpacingInImage);
 		printImageData(nextdepth, (*it).image);
-		printTileDefinition(nextdepth, (*it)._tiles);
+		printTileDefinition(nextdepth, (*it).tileDefinitions);
 	}
 }
 

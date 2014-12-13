@@ -201,7 +201,26 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 	}
 
 	outMap->version = element->Attribute("version");
-	outMap->orientation = element->Attribute("orientation");
+	const char* orientation = element->Attribute("orientation");
+	if (orientation != NULL)
+	{
+		if (strcmp(orientation, "orthogonal") == 0)
+		{
+			outMap->orientation = TmxOrientation::kOrthogonal;
+		}
+		else if (strcmp(orientation, "isometric") == 0)
+		{
+			outMap->orientation = TmxOrientation::kIsometric;
+		}
+		else if (strcmp(orientation, "staggered") == 0)
+		{
+			outMap->orientation = TmxOrientation::kStaggered;
+		}
+	}
+	else
+	{
+		LOGW("Missing orientation attribute");
+	}
 
 	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "width", &outMap->width);
 	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "height", &outMap->height);
@@ -493,7 +512,6 @@ TmxReturn _parseLayerDataNode(tinyxml2::XMLElement* element, const TmxTilesetCol
 		csvbase64.erase(std::remove(csvbase64.begin(), csvbase64.end(), ' '), csvbase64.end());
 
 		std::string csv = base64_decode(csvbase64);
-
 
 		unsigned int length = csv.size() / sizeof(unsigned int);
 

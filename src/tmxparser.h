@@ -64,28 +64,9 @@ typedef std::map<std::string, std::string> TmxPropertyMap_t;
 typedef unsigned int TileId_t;
 
 
-/**
- * Used to identify tmx file encoding type for data tags
- */
 typedef enum
 {
-	kEncodingXml,   //!< No encoding in tiled means XML
-	kEncodingBase64,//!< kEncodingBase64
-	kEncodingCsv    //!< kEncodingCsv
-} TmxDataNodeEncodingType;
-
-
-typedef enum
-{
-	kCompressionNone,
-	kCompressionZlib,
-	kCompressionGzip,
-} TmxDataCompressionType;
-
-
-typedef enum
-{
-	kOrthogonal,
+	kOrthogonal = 0,
 	kIsometric,
 	kStaggered
 } TmxOrientation;
@@ -233,7 +214,7 @@ typedef std::vector<TmxLayer> TmxLayerCollection_t;
 typedef struct
 {
 	std::string version;
-	std::string orientation;
+	TmxOrientation orientation;
 	unsigned int width;
 	unsigned int height;
 	unsigned int tileWidth;

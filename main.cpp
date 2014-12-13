@@ -176,7 +176,7 @@ void printTmxMapData(const tmxparser::TmxMap* map)
 	printf_depth(0, "%s", "<map>");
 	depth = 1;
 	printf_depth(depth, "Version: %s", map->version.c_str());
-	printf_depth(depth, "Orientation: %s", map->orientation.c_str());
+	printf_depth(depth, "Orientation: %d", map->orientation);
 	printf_depth(depth, "Width: %u", map->width);
 	printf_depth(depth, "Height: %u", map->height);
 	printf_depth(depth, "TileWidth: %u", map->tileWidth);

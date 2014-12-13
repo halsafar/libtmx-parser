@@ -127,6 +127,8 @@ void printTilesets(int depth, const tmxparser::TmxTilesetCollection_t& collectio
 		printf_depth(nextdepth, "Height: %u", (*it).tileHeight);
 		printf_depth(nextdepth, "MarginImage: %u", (*it).tileMarginInImage);
 		printf_depth(nextdepth, "SpaceImage: %u", (*it).tileSpacingInImage);
+		printf_depth(nextdepth, "rowCount: %u", (*it).colCount);
+		printf_depth(nextdepth, "colCount: %u", (*it).rowCount);
 		printImageData(nextdepth, (*it).image);
 		printTileDefinition(nextdepth, (*it).tileDefinitions);
 	}

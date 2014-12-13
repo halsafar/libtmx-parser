@@ -333,6 +333,7 @@ TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTilese
 		outTileset->tileSpacingInImage = element->UnsignedAttribute("spacing");
 		outTileset->tileMarginInImage = element->UnsignedAttribute("margin");
 
+		// TODO - read TODO at end of this function
 		if (element->FirstChildElement("image") == NULL)
 		{
 			LOGE("We do not support maps with tilesets that have no image associated currently...");
@@ -350,6 +351,11 @@ TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTilese
 		for (tinyxml2::XMLElement* child = element->FirstChildElement("tile"); child != NULL; child = child->NextSiblingElement("tile"))
 		{
 			TmxTileDefinition tileDef;
+
+			tileDef.id = 0;
+			tileDef.tileXIndex = 0;
+			tileDef.tileYIndex = 0;
+
 			error = _parseTileDefinitionNode(child, &tileDef);
 			if (error)
 			{
@@ -360,14 +366,17 @@ TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTilese
 			outTileset->tileDefinitions[tileDef.id] = tileDef;
 		}
 
-		// calculate tile indices
-		unsigned int colCount = (outTileset->image.width / outTileset->tileWidth);
-		unsigned int rowCount = (outTileset->image.height / outTileset->tileHeight);
-		for (unsigned int i = 0; i < colCount * rowCount; i++)
+		// derive row/col count, calculate tile indices
+		// TODO - this is why we do not accept tilesets without image tag atm
+		unsigned int marginSpacingWidthDelta = outTileset->tileMarginInImage * outTileset->tileSpacingInImage * outTileset->tileWidth;
+		unsigned int marginSpacingHeightDelta = outTileset->tileMarginInImage * outTileset->tileSpacingInImage * outTileset->tileHeight;
+		outTileset->colCount = ((outTileset->image.width - marginSpacingWidthDelta) / outTileset->tileWidth);
+		outTileset->rowCount = ((outTileset->image.height - marginSpacingHeightDelta) / outTileset->tileHeight);
+		for (unsigned int i = 0; i < outTileset->colCount * outTileset->rowCount; i++)
 		{
 			outTileset->tileDefinitions[i].id = i;
-			outTileset->tileDefinitions[i].tileXIndex = i % colCount;
-			outTileset->tileDefinitions[i].tileYIndex = i / colCount;
+			outTileset->tileDefinitions[i].tileXIndex = i % outTileset->colCount;
+			outTileset->tileDefinitions[i].tileYIndex = i / outTileset->colCount;
 		}
 	}
 

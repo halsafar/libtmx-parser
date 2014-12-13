@@ -177,6 +177,10 @@ typedef struct
 	unsigned int tileHeight;
 	unsigned int tileSpacingInImage;
 	unsigned int tileMarginInImage;
+
+	unsigned int rowCount; /// based on image width and tile spacing/margins
+	unsigned int colCount; /// based on image height and tile spacing/margins
+
 	TmxImage image;
 	TmxTileDefinitionMap_t tileDefinitions;
 } TmxTileset;
@@ -231,19 +235,19 @@ typedef struct
 
 /**
  * Parse a tmx from a filename.
- * @param fileName
- * @param outMap
- * @return
+ * @param fileName - Relative or Absolute filename to the TMX file to load
+ * @param outMap - An allocated TmxMap object ready to be populated
+ * @return 0 for success
  */
 TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap, const std::string& tilesetPath);
 
 
 /**
- * Parse a tmx file from memory.
- * @param data Tmx file in memory
+ * Parse a tmx file from memory.  Useful for Android or IOS.
+ * @param data Tmx file in memory, still in its xml format just already loaded.
  * @param length Size of the data buffer
- * @param outMap
- * @return
+ * @param outMap - An allocated TmxMap object ready to be populated
+ * @return 0 for success
  */
 TmxReturn parseFromMemory(void* data, size_t length, TmxMap* outMap, const std::string& tilesetPath);
 

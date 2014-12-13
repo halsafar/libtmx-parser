@@ -21,7 +21,10 @@
    </animation>
   </tile>
  </tileset>
- <tileset firstgid="925" name="legend_of_zelda_one_overworld_tiles" tilewidth="16" tileheight="16">
+ <tileset firstgid="925" name="super_mario_one_tileset" tilewidth="16" tileheight="16" spacing="2" margin="2">
+  <image source="../../brickdodge/assets/textures/super_mario_one_tileset.png" width="528" height="448"/>
+ </tileset>
+ <tileset firstgid="1621" name="legend_of_zelda_one_overworld_tiles" tilewidth="16" tileheight="16" spacing="1" margin="1">
   <image source="legend_of_zelda_one_overworld_tiles.png" width="307" height="163"/>
  </tileset>
  <layer name="World" width="10" height="10">
@@ -46,16 +49,16 @@
    <tile gid="41"/>
    <tile gid="42"/>
    <tile gid="43"/>
-   <tile gid="925"/>
-   <tile gid="926"/>
-   <tile gid="927"/>
-   <tile gid="928"/>
-   <tile gid="929"/>
-   <tile gid="930"/>
-   <tile gid="931"/>
-   <tile gid="932"/>
-   <tile gid="933"/>
-   <tile gid="934"/>
+   <tile gid="1621"/>
+   <tile gid="1622"/>
+   <tile gid="1623"/>
+   <tile gid="1624"/>
+   <tile gid="1625"/>
+   <tile gid="1626"/>
+   <tile gid="1627"/>
+   <tile gid="1628"/>
+   <tile gid="1629"/>
+   <tile gid="1630"/>
    <tile gid="61"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -129,7 +132,7 @@
   </data>
  </layer>
  <objectgroup name="Collision">
-  <object id="1" name="testRect" type="testRect" x="0" y="1" width="160" height="160">
+  <object id="1" name="testRect" type="testRect" x="0" y="0" width="160" height="160">
    <properties>
     <property name="Test" value="1"/>
    </properties>

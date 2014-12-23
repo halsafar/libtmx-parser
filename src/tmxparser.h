@@ -51,6 +51,8 @@ typedef enum
 	kMissingMapNode,
 	kMissingDataNode,
 	kMalformedPropertyNode,
+	kInvalidTileIndex,
+	kUnknownTileIndices,
 } TmxReturn;
 
 
@@ -79,6 +81,15 @@ typedef enum
 	kEllipse,
 	kSquare,
 } TmxShapeType;
+
+
+typedef struct
+{
+	float u;
+	float v;
+	float u2;
+	float v2;
+} TmxRect;
 
 
 typedef struct
@@ -141,8 +152,6 @@ typedef std::vector<TmxObjectGroup> TmxObjectGroupCollection_t;
 typedef struct
 {
 	TileId_t id;
-	unsigned int tileXIndex;
-	unsigned int tileYIndex;
 	TmxPropertyMap_t propertyMap;
 	TmxAnimationFrameCollection_t animations;
 	TmxObjectGroupCollection_t objectgroups;
@@ -235,9 +244,9 @@ typedef struct
 
 /**
  * Parse a tmx from a filename.
- * @param fileName - Relative or Absolute filename to the TMX file to load
- * @param outMap - An allocated TmxMap object ready to be populated
- * @return 0 for success
+ * @param fileName Relative or Absolute filename to the TMX file to load.
+ * @param outMap An allocated TmxMap object ready to be populated.
+ * @return kSuccess on success.
  */
 TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap, const std::string& tilesetPath);
 
@@ -245,11 +254,22 @@ TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap, const std::
 /**
  * Parse a tmx file from memory.  Useful for Android or IOS.
  * @param data Tmx file in memory, still in its xml format just already loaded.
- * @param length Size of the data buffer
- * @param outMap - An allocated TmxMap object ready to be populated
- * @return 0 for success
+ * @param length Size of the data buffer.
+ * @param outMap An allocated TmxMap object ready to be populated.
+ * @return kSuccess on success.
  */
 TmxReturn parseFromMemory(void* data, size_t length, TmxMap* outMap, const std::string& tilesetPath);
+
+
+/**
+ * Takes a tileset and an index with that tileset and generates OpenGL/DX ready texture coordinates.
+ * @param tileset A tileset to use for generating coordinates.
+ * @param tileFlatIndex The flat index into the tileset.
+ * @param pixelCorrection The amount to use for pixel correct, 0.5f is typical, see 'half-pixel correction'.
+ * @param outRect Contains the four corners of the tile.
+ * @return kSuccess on success.
+ */
+TmxReturn calculateTileCoordinates(const TmxTileset& tileset,  unsigned int tileFlatIndex, float pixelCorrection, TmxRect& outRect);
 
 
 }

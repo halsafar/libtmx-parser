@@ -135,16 +135,8 @@ TmxReturn _parseLayerNode(tinyxml2::XMLElement* element, const TmxTilesetCollect
 TmxReturn _parseLayerDataNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTileCollection_t* outTileCollection);
 TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTile* outTile);
 TmxReturn _calculateTileIndices(const TmxTilesetCollection_t& tilesets, TmxLayerTile* outTile);
-//TmxLayerTileCollection_t _parseLayerCsvDataNode(tinyxml2::XMLElement* element);
-//TmxLayerTileCollection_t _parseLayerBase64DataNode(tinyxml2::XMLElement* element);
 TmxReturn _parseObjectGroupNode(tinyxml2::XMLElement* element, TmxObjectGroup* outObjectGroup);
 TmxReturn _parseObjectNode(tinyxml2::XMLElement* element, TmxObject* outObj);
-
-
-TmxReturn queryUnsignedAttribute(tinyxml2::XMLElement* element, const std::string& name, unsigned int* out)
-{
-	return element->QueryUnsignedAttribute(name.c_str(), out) != tinyxml2::XML_NO_ATTRIBUTE ? TmxReturn::kSuccess : TmxReturn::kMissingRequiredAttribute;
-}
 
 
 TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap, const std::string& tilesetPath)
@@ -353,8 +345,6 @@ TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTilese
 			TmxTileDefinition tileDef;
 
 			tileDef.id = 0;
-			tileDef.tileXIndex = 0;
-			tileDef.tileYIndex = 0;
 
 			error = _parseTileDefinitionNode(child, &tileDef);
 			if (error)
@@ -372,12 +362,6 @@ TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTilese
 		unsigned int marginSpacingHeightDelta = outTileset->tileMarginInImage * outTileset->tileSpacingInImage * outTileset->tileHeight;
 		outTileset->colCount = ((outTileset->image.width - marginSpacingWidthDelta) / outTileset->tileWidth);
 		outTileset->rowCount = ((outTileset->image.height - marginSpacingHeightDelta) / outTileset->tileHeight);
-		for (unsigned int i = 0; i < outTileset->colCount * outTileset->rowCount; i++)
-		{
-			outTileset->tileDefinitions[i].id = i;
-			outTileset->tileDefinitions[i].tileXIndex = i % outTileset->colCount;
-			outTileset->tileDefinitions[i].tileYIndex = i / outTileset->colCount;
-		}
 	}
 
 	return TmxReturn::kSuccess;
@@ -566,40 +550,40 @@ TmxReturn _calculateTileIndices(const TmxTilesetCollection_t& tilesets, TmxLayer
 	outTile->tilesetIndex = 0;
 	outTile->tileFlatIndex = 0;
 
+	// exit quickly
+	if (outTile->gid == 0)
+	{
+		return TmxReturn::kSuccess;
+	}
+
 	// search for tilesetindex
 	// O(n) where n = number of tilesets
 	// Generally n will never be high but this method is called from an O(m) method.
-	if (outTile->gid != 0)
+	unsigned int index = 0;
+	unsigned int lastEndIndex = 1;
+	for (auto it = tilesets.begin(); it != tilesets.end(); ++it)
 	{
-		unsigned int index = 0;
-		unsigned int lastEndIndex = 1;
-		for (auto it = tilesets.begin(); it != tilesets.end(); ++it)
+		unsigned int colCount = it->colCount;
+		unsigned int rowCount = it->rowCount;
+		unsigned int startIndex = it->firstgid;
+		unsigned int endIndex = it->firstgid + ( colCount * rowCount );
+
+		if (outTile->gid >= startIndex && outTile->gid < endIndex)
 		{
-			unsigned int colCount = (it->image.width / it->tileWidth);
-			unsigned int rowCount = (it->image.height / it->tileHeight);
-			unsigned int startIndex = it->firstgid;
-			unsigned int endIndex = it->firstgid + ( colCount * rowCount );
+			outTile->tilesetIndex = index;
+			outTile->tileFlatIndex = (outTile->gid) - lastEndIndex;
 
-			if (outTile->gid >= startIndex && outTile->gid < endIndex)
-			{
-				outTile->tilesetIndex = index;
-				outTile->tileFlatIndex = (outTile->gid) - lastEndIndex;
-
-				// convert flat index to 2D
-				//outTile->tileXIndex = outTile->tileFlatIndex % colCount;
-				//outTile->tileYIndex = outTile->tileFlatIndex / colCount;
-
-				// done
-				return TmxReturn::kSuccess;
-			}
-
-			lastEndIndex = endIndex;
-
-			index++;
+			// done
+			return TmxReturn::kSuccess;
 		}
+
+		lastEndIndex = endIndex;
+
+		index++;
 	}
 
-	return TmxReturn::kSuccess;
+	// if we made it here, tile indices could not be f
+	return TmxReturn::kUnknownTileIndices;
 }
 
 
@@ -721,6 +705,29 @@ TmxReturn _parseObjectNode(tinyxml2::XMLElement* element, TmxObject* outObj)
 	}
 
 	return error;
+}
+
+
+TmxReturn calculateTileCoordinates(const TmxTileset& tileset,  unsigned int tileFlatIndex, float pixelCorrection, TmxRect& outRect)
+{
+	if (tileFlatIndex >= tileset.colCount * tileset.rowCount)
+	{
+		return TmxReturn::kInvalidTileIndex;
+	}
+
+	TileId_t xIndex = tileFlatIndex % tileset.colCount;
+	TileId_t yIndex = tileFlatIndex / tileset.colCount;
+
+	unsigned int widthDelta = tileset.tileSpacingInImage + tileset.tileMarginInImage*xIndex;
+	unsigned int heightDelta = tileset.tileSpacingInImage + tileset.tileMarginInImage*yIndex;
+
+	outRect.u = (float)((xIndex * tileset.tileWidth) + widthDelta + pixelCorrection) / (float)tileset.image.width;
+	outRect.v = (float)((yIndex * tileset.tileHeight) + heightDelta + pixelCorrection) / (float)tileset.image.height;
+
+	outRect.u2 = (float)((( (xIndex+1) * tileset.tileWidth) + widthDelta) - pixelCorrection) / (float)tileset.image.width;
+	outRect.v2 = (float)((( (yIndex+1) * tileset.tileHeight) + heightDelta) - pixelCorrection) / (float)tileset.image.height;
+
+	return kSuccess;
 }
 
 

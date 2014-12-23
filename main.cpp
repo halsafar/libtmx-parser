@@ -95,8 +95,7 @@ void printTileDefinition(int depth, const tmxparser::TmxTileDefinitionMap_t& map
 	{
 		printf_depth(depth, "%s", "<tile>");
 		printf_depth(depth+1, "Id: %u", it->second.id);
-		printf_depth(depth+1, "tileXIndex: %u", it->second.tileXIndex);
-		printf_depth(depth+1, "tileYIndex: %u", it->second.tileYIndex);
+
 		printProperties(depth+1, it->second.propertyMap);
 
 		// animations
@@ -146,8 +145,6 @@ void printLayerTiles(int depth, const tmxparser::TmxLayerTileCollection_t& colle
 		printf_depth(nextdepth, "Gid: %u", it->gid);
 		printf_depth(nextdepth, "tilesetIndex: %u", it->tilesetIndex);
 		printf_depth(nextdepth, "tileFlatIndex: %u", it->tileFlatIndex);
-		//printf_depth(nextdepth, "tileXIndex: %u", it->tileXIndex);
-		//printf_depth(nextdepth, "tileYIndex: %u", it->tileYIndex);
 	}
 }
 
@@ -218,6 +215,14 @@ int main()
 	if (!error)
 	{
 		printTmxMapData(&map);
+
+		tmxparser::TmxRect rect;
+		rect.u = 0; rect.v = 0; rect.u2 = 0; rect.v2 = 0;
+		for (auto it : map.layerCollection[0].tiles)
+		{
+			tmxparser::calculateTileCoordinates(map.tilesetCollection[it.tilesetIndex], it.tileFlatIndex, 0.5f, rect);
+			printf("Tileset[%u]@Tile[%u]=Rect( (%f, %f)->(%f, %f) )\n", it.tilesetIndex, it.tileFlatIndex, rect.u, rect.v, rect.u2, rect.v2);
+		}
 	}
 	else
 	{

@@ -582,7 +582,7 @@ TmxReturn _calculateTileIndices(const TmxTilesetCollection_t& tilesets, TmxLayer
 		index++;
 	}
 
-	// if we made it here, tile indices could not be f
+	// if we made it here, tile indices could not be found
 	return TmxReturn::kUnknownTileIndices;
 }
 

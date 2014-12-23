@@ -51,6 +51,8 @@ typedef enum
 	kMissingMapNode,
 	kMissingDataNode,
 	kMalformedPropertyNode,
+	kInvalidTileIndex,
+	kUnknownTileIndices,
 } TmxReturn;
 
 
@@ -61,28 +63,12 @@ typedef std::map<std::string, std::string> TmxPropertyMap_t;
 #endif
 
 
-/**
- * Used to identify tmx file encoding type for data tags
- */
-typedef enum
-{
-	kEncodingXml,   //!< No encoding in tiled means XML
-	kEncodingBase64,//!< kEncodingBase64
-	kEncodingCsv    //!< kEncodingCsv
-} TmxDataNodeEncodingType;
+typedef unsigned int TileId_t;
 
 
 typedef enum
 {
-	kCompressionNone,
-	kCompressionZlib,
-	kCompressionGzip,
-} TmxDataCompressionType;
-
-
-typedef enum
-{
-	kOrthogonal,
+	kOrthogonal = 0,
 	kIsometric,
 	kStaggered
 } TmxOrientation;
@@ -99,6 +85,15 @@ typedef enum
 
 typedef struct
 {
+	float u;
+	float v;
+	float u2;
+	float v2;
+} TmxRect;
+
+
+typedef struct
+{
 	std::string name;
 	std::string value;
 } TmxProperty;
@@ -106,73 +101,12 @@ typedef struct
 
 typedef struct
 {
-	unsigned int id;
-	TmxPropertyMap_t propertyMap;
-} TmxTileDefinition;
+	TileId_t tileId;
+	float duration;
+} TmxAnimationFrame;
 
 
-typedef std::vector<TmxTileDefinition> TmxTileDefinitionCollection_t;
-
-
-typedef struct
-{
-	int x;
-	int y;
-} TmxTileOffset;
-
-
-typedef struct
-{
-	std::string format;
-	std::string source;
-	std::string transparentColor;
-	unsigned int width;
-	unsigned int height;
-} TmxImage;
-
-
-typedef struct
-{
-	unsigned int firstgid;
-	std::string name;
-	unsigned int tileWidth;
-	unsigned int tileHeight;
-	unsigned int tileSpacingInImage;
-	unsigned int tileMarginInImage;
-	TmxImage image;
-	TmxTileDefinitionCollection_t _tiles;
-} TmxTileset;
-
-
-typedef std::vector<TmxTileset> TmxTilesetCollection_t;
-
-
-typedef struct
-{
-	unsigned int gid;
-	unsigned int tilesetIndex;
-	unsigned int tileFlatIndex;
-	unsigned int tileXIndex;
-	unsigned int tileYIndex;
-} TmxLayerTile;
-
-
-typedef std::vector<TmxLayerTile> TmxLayerTileCollection_t;
-
-
-typedef struct
-{
-	std::string name;
-	unsigned int width;
-	unsigned int height;
-	float opacity;
-	bool visible;
-	TmxPropertyMap_t propertyMap;
-	TmxLayerTileCollection_t tiles;
-} TmxLayer;
-
-
-typedef std::vector<TmxLayer> TmxLayerCollection_t;
+typedef std::vector<TmxAnimationFrame> TmxAnimationFrameCollection_t;
 
 
 typedef std::pair<float, float> TmxShapePoint;
@@ -187,8 +121,8 @@ typedef struct
 	std::string type;
 	float x;
 	float y;
-	unsigned int width;
-	unsigned int height;
+	float width;
+	float height;
 	float rotation;
 	unsigned int referenceGid;
 	bool visible;
@@ -217,8 +151,83 @@ typedef std::vector<TmxObjectGroup> TmxObjectGroupCollection_t;
 
 typedef struct
 {
+	TileId_t id;
+	TmxPropertyMap_t propertyMap;
+	TmxAnimationFrameCollection_t animations;
+	TmxObjectGroupCollection_t objectgroups;
+} TmxTileDefinition;
+
+
+typedef std::unordered_map<unsigned int, TmxTileDefinition> TmxTileDefinitionMap_t;
+
+
+typedef struct
+{
+	int x;
+	int y;
+} TmxTileOffset;
+
+
+typedef struct
+{
+	std::string format;
+	std::string source;
+	std::string transparentColor;
+	unsigned int width;
+	unsigned int height;
+} TmxImage;
+
+
+typedef struct
+{
+	unsigned int firstgid;
+	std::string name;
+	unsigned int tileWidth;
+	unsigned int tileHeight;
+	unsigned int tileSpacingInImage;
+	unsigned int tileMarginInImage;
+
+	unsigned int rowCount; /// based on image width and tile spacing/margins
+	unsigned int colCount; /// based on image height and tile spacing/margins
+
+	TmxImage image;
+	TmxTileDefinitionMap_t tileDefinitions;
+} TmxTileset;
+
+
+typedef std::vector<TmxTileset> TmxTilesetCollection_t;
+
+
+typedef struct
+{
+	unsigned int gid;
+	unsigned int tilesetIndex;
+	unsigned int tileFlatIndex;
+} TmxLayerTile;
+
+
+typedef std::vector<TmxLayerTile> TmxLayerTileCollection_t;
+
+
+typedef struct
+{
+	std::string name;
+	unsigned int width;
+	unsigned int height;
+	float opacity;
+	bool visible;
+	TmxPropertyMap_t propertyMap;
+	TmxLayerTileCollection_t tiles;
+} TmxLayer;
+
+
+typedef std::vector<TmxLayer> TmxLayerCollection_t;
+
+
+typedef struct
+{
 	std::string version;
-	std::string orientation;
+	TmxOrientation orientation;
 	unsigned int width;
 	unsigned int height;
 	unsigned int tileWidth;
@@ -235,21 +244,32 @@ typedef struct
 
 /**
  * Parse a tmx from a filename.
- * @param fileName
- * @param outMap
- * @return
+ * @param fileName Relative or Absolute filename to the TMX file to load.
+ * @param outMap An allocated TmxMap object ready to be populated.
+ * @return kSuccess on success.
  */
 TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap, const std::string& tilesetPath);
 
 
 /**
- * Parse a tmx file from memory.
- * @param data Tmx file in memory
- * @param length Size of the data buffer
- * @param outMap
- * @return
+ * Parse a tmx file from memory.  Useful for Android or IOS.
+ * @param data Tmx file in memory, still in its xml format just already loaded.
+ * @param length Size of the data buffer.
+ * @param outMap An allocated TmxMap object ready to be populated.
+ * @return kSuccess on success.
  */
 TmxReturn parseFromMemory(void* data, size_t length, TmxMap* outMap, const std::string& tilesetPath);
+
+
+/**
+ * Takes a tileset and an index with that tileset and generates OpenGL/DX ready texture coordinates.
+ * @param tileset A tileset to use for generating coordinates.
+ * @param tileFlatIndex The flat index into the tileset.
+ * @param pixelCorrection The amount to use for pixel correct, 0.5f is typical, see 'half-pixel correction'.
+ * @param outRect Contains the four corners of the tile.
+ * @return kSuccess on success.
+ */
+TmxReturn calculateTileCoordinates(const TmxTileset& tileset,  unsigned int tileFlatIndex, float pixelCorrection, TmxRect& outRect);
 
 
 }

@@ -110,8 +110,23 @@ TEST_F(TmxParseTest, TileDefinitions)
 
 	tmxparser::TmxTileset tileset = _map->tilesetCollection[0];
 
-	//ASSERT_EQ(tileset., tileset.tileDefinitions.size());
+	ASSERT_EQ(2, tileset.tileDefinitions.size());
 
+	tmxparser::TmxTileDefinition def = tileset.tileDefinitions[3];
+
+	ASSERT_EQ(3, def.id);
+	ASSERT_EQ(1, def.objectgroups.size());
+
+	tmxparser::TmxObjectGroup objGrp = def.objectgroups[0];
+
+	ASSERT_EQ(1, objGrp.objects.size());
+	ASSERT_EQ(3.18182f, objGrp.objects[0].x);
+	ASSERT_EQ(3.63636f, objGrp.objects[0].width);
+	ASSERT_EQ(4.72727f, objGrp.objects[0].height);
+	ASSERT_EQ(3, objGrp.objects[0].shapeType);
+	ASSERT_EQ(0, objGrp.objects[0].rotation);
+	ASSERT_EQ(0, objGrp.objects[0].visible);
+	ASSERT_EQ(0, objGrp.objects[0].referenceGid);
 }
 
 
@@ -167,6 +182,7 @@ TEST_F(TmxParseTest, TilesValidation)
 	int expectedGidValues[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
 							34, 35, 36, 37, 38, 39, 40, 41, 42, 43,
 							1621, 1622, 1623, 1624, 1625, 1626, 1627, 1628, 1629, 1630,
+							1639, 1640, 1641, 1642, 1643, 1644, 1645, 1646, 1647, 1648,
 							61};
 	int testTileCount = sizeof(expectedGidValues) / sizeof(int);
 	for (unsigned int i = 0; i < testTileCount; i++)
@@ -256,7 +272,7 @@ int main(int argc, char **argv)
 	printf("\033[32m" "==========\nXML TESTS\n==========\n" "\033[0m");
 	TmxParseTest::LoadMap("../test_files/test_xml_level.tmx");
 	retVal = RUN_ALL_TESTS();
-/*
+
 	printf("\033[32m" "==========\nCSV TESTS\n==========\n" "\033[0m");
 	TmxParseTest::LoadMap("../test_files/test_csv_level.tmx");
 	retVal = !retVal && RUN_ALL_TESTS();
@@ -264,6 +280,6 @@ int main(int argc, char **argv)
 	printf("\033[32m" "==========\nBASE64 TESTS\n==========\n" "\033[0m");
 	TmxParseTest::LoadMap("../test_files/test_base64_level.tmx");
 	retVal = !retVal && RUN_ALL_TESTS();
-*/
+
 	return retVal;
 }

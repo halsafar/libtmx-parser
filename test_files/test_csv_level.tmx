@@ -8,23 +8,32 @@
    </objectgroup>
   </tile>
   <tile id="60">
+   <properties>
+    <property name="Test" value="1"/>
+   </properties>
+   <objectgroup draworder="index">
+    <object id="0" x="0" y="0" width="16" height="16"/>
+   </objectgroup>
    <animation>
-    <frame tileid="258" duration="100"/>
-    <frame tileid="259" duration="100"/>
-    <frame tileid="260" duration="100"/>
+    <frame tileid="60" duration="298"/>
+    <frame tileid="61" duration="100"/>
+    <frame tileid="62" duration="100"/>
    </animation>
   </tile>
  </tileset>
- <tileset firstgid="925" name="legend_of_zelda_one_overworld_tiles" tilewidth="16" tileheight="16">
+ <tileset firstgid="925" name="super_mario_one_tileset" tilewidth="16" tileheight="16" spacing="2" margin="2">
+  <image source="../../brickdodge/assets/textures/super_mario_one_tileset.png" width="528" height="448"/>
+ </tileset>
+ <tileset firstgid="1621" name="legend_of_zelda_one_overworld_tiles" tilewidth="16" tileheight="16" spacing="1" margin="1">
   <image source="legend_of_zelda_one_overworld_tiles.png" width="307" height="163"/>
  </tileset>
  <layer name="World" width="10" height="10">
   <data encoding="csv">
 1,2,3,4,5,6,7,8,9,10,
 34,35,36,37,38,39,40,41,42,43,
-925,926,927,928,929,930,931,932,933,934,
+1621,1622,1623,1624,1625,1626,1627,1628,1629,1630,
+1639,1640,1641,1642,1643,1644,1645,1646,1647,1648,
 61,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,
@@ -33,7 +42,11 @@
 </data>
  </layer>
  <objectgroup name="Collision">
-  <object id="1" name="testRect" type="testRect" x="0" y="1" width="160" height="160"/>
+  <object id="1" name="testRect" type="testRect" x="0" y="0" width="160" height="160">
+   <properties>
+    <property name="Test" value="1"/>
+   </properties>
+  </object>
   <object id="2" name="testCircle" type="testType" x="48" y="83" width="73" height="73">
    <ellipse/>
   </object>

@@ -708,7 +708,7 @@ TmxReturn _parseObjectNode(tinyxml2::XMLElement* element, TmxObject* outObj)
 }
 
 
-TmxReturn calculateTileCoordinates(const TmxTileset& tileset,  unsigned int tileFlatIndex, float pixelCorrection, TmxRect& outRect)
+TmxReturn calculateTileCoordinatesUV(const TmxTileset& tileset,  unsigned int tileFlatIndex, float pixelCorrection, bool flipY, TmxRect& outRect)
 {
 	if (tileFlatIndex >= tileset.colCount * tileset.rowCount)
 	{
@@ -721,11 +721,23 @@ TmxReturn calculateTileCoordinates(const TmxTileset& tileset,  unsigned int tile
 	unsigned int widthDelta = tileset.tileSpacingInImage + tileset.tileMarginInImage*xIndex;
 	unsigned int heightDelta = tileset.tileSpacingInImage + tileset.tileMarginInImage*yIndex;
 
-	outRect.u = (float)((xIndex * tileset.tileWidth) + widthDelta + pixelCorrection) / (float)tileset.image.width;
-	outRect.v = (float)((yIndex * tileset.tileHeight) + heightDelta + pixelCorrection) / (float)tileset.image.height;
+	float u = (float)((xIndex * tileset.tileWidth) + widthDelta + pixelCorrection) / (float)tileset.image.width;
+	float v = (float)((yIndex * tileset.tileHeight) + heightDelta + pixelCorrection) / (float)tileset.image.height;
 
-	outRect.u2 = (float)((( (xIndex+1) * tileset.tileWidth) + widthDelta) - pixelCorrection) / (float)tileset.image.width;
-	outRect.v2 = (float)((( (yIndex+1) * tileset.tileHeight) + heightDelta) - pixelCorrection) / (float)tileset.image.height;
+	float u2 = (float)((( (xIndex+1) * tileset.tileWidth) + widthDelta) - pixelCorrection) / (float)tileset.image.width;
+	float v2 = (float)((( (yIndex+1) * tileset.tileHeight) + heightDelta) - pixelCorrection) / (float)tileset.image.height;
+
+	if (flipY)
+	{
+		float tmpV = v;
+		v = 1.0 - v2;
+		v2 = 1.0 - tmpV;
+	}
+
+	outRect.u = u;
+	outRect.v = v;
+	outRect.u2 = u2;
+	outRect.v2 = v2;
 
 	return kSuccess;
 }

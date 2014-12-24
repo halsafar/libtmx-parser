@@ -269,7 +269,7 @@ TmxReturn parseFromMemory(void* data, size_t length, TmxMap* outMap, const std::
  * @param outRect Contains the four corners of the tile.
  * @return kSuccess on success.
  */
-TmxReturn calculateTileCoordinates(const TmxTileset& tileset,  unsigned int tileFlatIndex, float pixelCorrection, TmxRect& outRect);
+TmxReturn calculateTileCoordinatesUV(const TmxTileset& tileset,  unsigned int tileFlatIndex, float pixelCorrection, bool flipY, TmxRect& outRect);
 
 
 }

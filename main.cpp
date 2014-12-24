@@ -220,7 +220,7 @@ int main()
 		rect.u = 0; rect.v = 0; rect.u2 = 0; rect.v2 = 0;
 		for (auto it : map.layerCollection[0].tiles)
 		{
-			tmxparser::calculateTileCoordinates(map.tilesetCollection[it.tilesetIndex], it.tileFlatIndex, 0.5f, rect);
+			tmxparser::calculateTileCoordinatesUV(map.tilesetCollection[it.tilesetIndex], it.tileFlatIndex, 0.5f, true, rect);
 			printf("Tileset[%u]@Tile[%u]=Rect( (%f, %f)->(%f, %f) )\n", it.tilesetIndex, it.tileFlatIndex, rect.u, rect.v, rect.u2, rect.v2);
 		}
 	}

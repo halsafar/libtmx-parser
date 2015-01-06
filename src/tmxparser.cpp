@@ -109,7 +109,7 @@ namespace tmxparser
 	LHS = XMLELEMENT->Attribute(ATTRIBNAME); \
 	if (LHS.size() == 0) \
 	{ \
-		LOGE("Missing required attribute [%s]", ATTRIBNAME) \
+		LOGE("Missing required attribute [%s]", ATTRIBNAME); \
 		return TmxReturn::kMissingRequiredAttribute; \
 	}
 
@@ -117,7 +117,7 @@ namespace tmxparser
 #define CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(FUNC, ATTRIBNAME, OUT) \
 		if (FUNC(ATTRIBNAME, OUT) == tinyxml2::XML_NO_ATTRIBUTE) \
 		{ \
-			LOGE("Missing required attribute [%s]", ATTRIBNAME) \
+			LOGE("Missing required attribute [%s]", ATTRIBNAME); \
 			return kMissingRequiredAttribute; \
 		}
 

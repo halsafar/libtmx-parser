@@ -210,6 +210,7 @@ typedef struct
 	unsigned int gid;
 	unsigned int tilesetIndex;
 	unsigned int tileFlatIndex;
+	bool flipX, flipY, flipDiagonal;
 } TmxLayerTile;
 
 

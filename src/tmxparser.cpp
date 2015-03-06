@@ -545,7 +545,15 @@ TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTileset
 {
 	TmxReturn error = TmxReturn::kSuccess;
 
-	outTile->gid = element->UnsignedAttribute("gid");
+	auto gid = element->UnsignedAttribute("gid");
+	auto flipXFlag = 0x80000000;
+	auto flipYFlag = 0x40000000;
+	auto flipDiagonalFlag = 0x20000000;
+
+	outTile->flipX = (gid & flipXFlag ? true : false);
+	outTile->flipY = (gid & flipYFlag ? true : false);
+	outTile->flipDiagonal = (gid & flipDiagonalFlag ? true : false);
+	outTile->gid = (gid & ~(flipXFlag | flipYFlag | flipDiagonalFlag));
 
 	return _calculateTileIndices(tilesets, outTile);
 }

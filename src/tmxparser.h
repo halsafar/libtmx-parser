@@ -28,10 +28,20 @@ THE SOFTWARE.
 
 #include <string>
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if defined __GXX_EXPERIMENTAL_CXX0X__ || (_MSC_VER >= 1800)
 #include <unordered_map>
+template <typename TKey, typename TValue>
+struct Map
+{
+	typedef std::unordered_map<TKey, TValue> type;
+};
 #else
 #include <map>
+template <typename TKey, typename TValue>
+struct Map
+{
+	typedef std::map<TKey, TValue> type;
+};
 #endif
 
 #include <vector>
@@ -56,11 +66,7 @@ typedef enum
 } TmxReturn;
 
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-typedef std::unordered_map<std::string, std::string> TmxPropertyMap_t;
-#else
-typedef std::map<std::string, std::string> TmxPropertyMap_t;
-#endif
+typedef Map<std::string, std::string>::type TmxPropertyMap_t;
 
 
 typedef unsigned int TileId_t;
@@ -158,14 +164,14 @@ typedef struct
 } TmxTileDefinition;
 
 
-typedef std::unordered_map<unsigned int, TmxTileDefinition> TmxTileDefinitionMap_t;
+typedef Map<unsigned int, TmxTileDefinition>::type TmxTileDefinitionMap_t;
 
 
 typedef struct
 {
 	int x;
 	int y;
-} TmxTileOffset;
+} TmxOffset;
 
 
 typedef struct
@@ -186,6 +192,7 @@ typedef struct
 	unsigned int tileHeight;
 	unsigned int tileSpacingInImage;
 	unsigned int tileMarginInImage;
+	TmxOffset offset;
 
 	unsigned int rowCount; /// based on image width and tile spacing/margins
 	unsigned int colCount; /// based on image height and tile spacing/margins
@@ -203,6 +210,7 @@ typedef struct
 	unsigned int gid;
 	unsigned int tilesetIndex;
 	unsigned int tileFlatIndex;
+	bool flipX, flipY, flipDiagonal;
 } TmxLayerTile;
 
 

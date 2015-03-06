@@ -137,6 +137,7 @@ TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTileset
 TmxReturn _calculateTileIndices(const TmxTilesetCollection_t& tilesets, TmxLayerTile* outTile);
 TmxReturn _parseObjectGroupNode(tinyxml2::XMLElement* element, TmxObjectGroup* outObjectGroup);
 TmxReturn _parseObjectNode(tinyxml2::XMLElement* element, TmxObject* outObj);
+TmxReturn _parseOffsetNode(tinyxml2::XMLElement* element, TmxOffset* offset);
 
 
 TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap, const std::string& tilesetPath)
@@ -340,6 +341,11 @@ TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTilese
 			return error;
 		}
 
+		if (element->FirstChildElement("tileoffset") != NULL)
+		{
+			_parseOffsetNode(element->FirstChildElement("tileoffset"), &outTileset->offset);
+		}
+
 		for (tinyxml2::XMLElement* child = element->FirstChildElement("tile"); child != NULL; child = child->NextSiblingElement("tile"))
 		{
 			TmxTileDefinition tileDef;
@@ -422,7 +428,7 @@ TmxReturn _parseLayerNode(tinyxml2::XMLElement* element, const TmxTilesetCollect
 
 	outLayer->name = element->Attribute("name");
 	outLayer->opacity = element->FloatAttribute("opacity");
-	outLayer->visible = element->IntAttribute("visible");
+	outLayer->visible = (element->IntAttribute("visible") == 1 ? true : false);
 	outLayer->width = element->UnsignedAttribute("width");
 	outLayer->height = element->UnsignedAttribute("height");
 
@@ -539,7 +545,15 @@ TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTileset
 {
 	TmxReturn error = TmxReturn::kSuccess;
 
-	outTile->gid = element->UnsignedAttribute("gid");
+	auto gid = element->UnsignedAttribute("gid");
+	auto flipXFlag = 0x80000000;
+	auto flipYFlag = 0x40000000;
+	auto flipDiagonalFlag = 0x20000000;
+
+	outTile->flipX = (gid & flipXFlag ? true : false);
+	outTile->flipY = (gid & flipYFlag ? true : false);
+	outTile->flipDiagonal = (gid & flipDiagonalFlag ? true : false);
+	outTile->gid = (gid & ~(flipXFlag | flipYFlag | flipDiagonalFlag));
 
 	return _calculateTileIndices(tilesets, outTile);
 }
@@ -696,9 +710,9 @@ TmxReturn _parseObjectNode(tinyxml2::XMLElement* element, TmxObject* outObj)
 			std::istringstream pointStringString(pairToken);
 			std::string pointToken;
 			std::getline(pointStringString, pointToken, ',');
-			pair.first = atof(pointToken.c_str());
+			pair.first = (float)atof(pointToken.c_str());
 			std::getline(pointStringString, pointToken, ',');
-			pair.second = atof(pointToken.c_str());
+			pair.second = (float)atof(pointToken.c_str());
 
 			outObj->shapePoints.push_back(pair);
 		}
@@ -730,8 +744,8 @@ TmxReturn calculateTileCoordinatesUV(const TmxTileset& tileset,  unsigned int ti
 	if (flipY)
 	{
 		float tmpV = v;
-		v = 1.0 - v2;
-		v2 = 1.0 - tmpV;
+		v = 1.f - v2;
+		v2 = 1.f - tmpV;
 	}
 
 	outRect.u = u;
@@ -742,5 +756,26 @@ TmxReturn calculateTileCoordinatesUV(const TmxTileset& tileset,  unsigned int ti
 	return kSuccess;
 }
 
+tmxparser::TmxReturn _parseOffsetNode(tinyxml2::XMLElement* element, TmxOffset* offset)
+{
+	TmxReturn error = TmxReturn::kSuccess;
+
+	offset->x = 0;
+	offset->y = 0;
+
+	if (element->Attribute("x"))
+	{
+		offset->x = element->IntAttribute("x");
+	}
+
+	if (element->Attribute("y"))
+	{
+		offset->y = element->IntAttribute("y");
+	}
+
+	return error;
+}
 
 }
+
+

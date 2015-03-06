@@ -171,7 +171,7 @@ typedef struct
 {
 	int x;
 	int y;
-} TmxTileOffset;
+} TmxOffset;
 
 
 typedef struct
@@ -192,6 +192,7 @@ typedef struct
 	unsigned int tileHeight;
 	unsigned int tileSpacingInImage;
 	unsigned int tileMarginInImage;
+	TmxOffset offset;
 
 	unsigned int rowCount; /// based on image width and tile spacing/margins
 	unsigned int colCount; /// based on image height and tile spacing/margins

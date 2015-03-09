@@ -52,8 +52,10 @@ THE SOFTWARE.
 
 #if defined(WIN32) || defined(_WIN32)
 #define PATH_SEPARATOR "\\"
+#define PATH_SEPARATOR_ALT "/"
 #else
 #define PATH_SEPARATOR "/"
+#define PATH_SEPARATOR_ALT "/" // needs value!
 #endif
 
 
@@ -125,6 +127,7 @@ namespace tmxparser
 // Prototypes
 TmxReturn _parseStart(tinyxml2::XMLElement* element, TmxMap* outMap, const std::string& tilesetPath);
 TmxReturn _parseEnd(TmxMap* outMap, const std::string& tilesetPath);
+void _parseEndHelper(TmxImage& image, const std::string& tilesetPath);
 TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap);
 TmxReturn _parsePropertyNode(tinyxml2::XMLElement* element, TmxPropertyMap_t* outPropertyMap);
 TmxReturn _parseImageNode(tinyxml2::XMLElement* element, TmxImage* outImage);
@@ -138,7 +141,7 @@ TmxReturn _calculateTileIndices(const TmxTilesetCollection_t& tilesets, TmxLayer
 TmxReturn _parseObjectGroupNode(tinyxml2::XMLElement* element, TmxObjectGroup* outObjectGroup);
 TmxReturn _parseObjectNode(tinyxml2::XMLElement* element, TmxObject* outObj);
 TmxReturn _parseOffsetNode(tinyxml2::XMLElement* element, TmxOffset* offset);
-
+TmxReturn _parseImageLayerNode(tinyxml2::XMLElement* element, TmxImageLayer* outImageLayer);
 
 TmxReturn parseFromFile(const std::string& fileName, TmxMap* outMap, const std::string& tilesetPath)
 {
@@ -177,12 +180,37 @@ TmxReturn _parseStart(tinyxml2::XMLElement* element, TmxMap* outMap, const std::
 TmxReturn _parseEnd(TmxMap* outMap, const std::string& tilesetPath)
 {
 	for (auto tileIt = outMap->tilesetCollection.begin(); tileIt != outMap->tilesetCollection.end(); ++tileIt)
-	{
-		std::string baseFilename = tileIt->image.source.substr(tileIt->image.source.find_last_of(PATH_SEPARATOR) + 1);
-		tileIt->image.source = tilesetPath + baseFilename;
-	}
+		_parseEndHelper(tileIt->image, tilesetPath);
+
+	for (auto tileIt = outMap->imageLayerCollection.begin(); tileIt != outMap->imageLayerCollection.end(); ++tileIt)
+		_parseEndHelper(tileIt->image, tilesetPath);
 
 	return TmxReturn::kSuccess;
+}
+
+
+void _parseEndHelper(TmxImage& image, const std::string& tilesetPath)
+{
+	auto pathSeperatorMissing = (image.source.find(PATH_SEPARATOR) == std::string::npos);
+	auto pathSeperatorAltMissing = (image.source.find(PATH_SEPARATOR_ALT) == std::string::npos);
+
+	if (pathSeperatorMissing && pathSeperatorAltMissing) // no path_seperator found --> relative path
+	{
+		std::string baseFilename = image.source.substr(image.source.find_last_of(PATH_SEPARATOR) + 1);
+
+		/*
+		 * here we find out what separator is used in tilesetPath and choose it
+		 * if both (alternative and normal) separators are used, we always use the normal separator
+		 **/
+		auto seperatorThere = (tilesetPath.find(PATH_SEPARATOR) != std::string::npos);
+		auto seperatorAltThere = (tilesetPath.find(PATH_SEPARATOR_ALT) != std::string::npos);
+		auto tileSetPathSeparator = PATH_SEPARATOR;
+
+		if (!seperatorThere && seperatorAltThere) // only alternative separator exists in tilesetPath --> choose it
+			tileSetPathSeparator = PATH_SEPARATOR_ALT;
+
+		image.source = tilesetPath + tileSetPathSeparator + baseFilename;
+	}
 }
 
 
@@ -270,6 +298,19 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 		outMap->objectGroupCollection.push_back(group);
 	}
 
+	for (tinyxml2::XMLElement* child = element->FirstChildElement("imagelayer"); child != NULL; child = child->NextSiblingElement("imagelayer"))
+	{
+		TmxImageLayer imageLayer;
+		error = _parseImageLayerNode(child, &imageLayer);
+		if (error)
+		{
+			LOGE("Error parsing imagelayer node...");
+			return error;
+		}
+
+		outMap->imageLayerCollection.push_back(imageLayer);
+	}
+
 	return error;
 }
 
@@ -341,9 +382,12 @@ TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTilese
 			return error;
 		}
 
+		outTileset->offset.x = 0;
+		outTileset->offset.y = 0;
+
 		if (element->FirstChildElement("tileoffset") != NULL)
 		{
-			_parseOffsetNode(element->FirstChildElement("tileoffset"), &outTileset->offset);
+			error = _parseOffsetNode(element->FirstChildElement("tileoffset"), &outTileset->offset);
 		}
 
 		for (tinyxml2::XMLElement* child = element->FirstChildElement("tile"); child != NULL; child = child->NextSiblingElement("tile"))
@@ -364,10 +408,8 @@ TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTilese
 
 		// derive row/col count, calculate tile indices
 		// TODO - this is why we do not accept tilesets without image tag atm
-		unsigned int marginSpacingWidthDelta = outTileset->tileMarginInImage * outTileset->tileSpacingInImage * outTileset->tileWidth;
-		unsigned int marginSpacingHeightDelta = outTileset->tileMarginInImage * outTileset->tileSpacingInImage * outTileset->tileHeight;
-		outTileset->colCount = ((outTileset->image.width - marginSpacingWidthDelta) / outTileset->tileWidth);
-		outTileset->rowCount = ((outTileset->image.height - marginSpacingHeightDelta) / outTileset->tileHeight);
+		outTileset->colCount = (outTileset->image.width - outTileset->tileMarginInImage) / (outTileset->tileWidth + outTileset->tileSpacingInImage);
+		outTileset->rowCount = (outTileset->image.height - outTileset->tileMarginInImage) / (outTileset->tileHeight + outTileset->tileSpacingInImage);
 	}
 
 	return TmxReturn::kSuccess;
@@ -413,7 +455,7 @@ TmxReturn _parseTileAnimationNode(tinyxml2::XMLElement* element, TmxAnimationFra
 	{
 		TmxAnimationFrame frame;
 		frame.duration = child->FloatAttribute("duration");
-		frame.tileId = child->UnsignedAttribute("id");
+		frame.tileId = child->UnsignedAttribute("tileid");
 
 		outAnimationCollection->push_back(frame);
 	}
@@ -427,8 +469,14 @@ TmxReturn _parseLayerNode(tinyxml2::XMLElement* element, const TmxTilesetCollect
 	TmxReturn error = TmxReturn::kSuccess;
 
 	outLayer->name = element->Attribute("name");
-	outLayer->opacity = element->FloatAttribute("opacity");
-	outLayer->visible = (element->IntAttribute("visible") == 1 ? true : false);
+	if (element->Attribute("opacity"))
+		outLayer->opacity = element->FloatAttribute("opacity");
+	else
+		outLayer->opacity = 1.f;
+	if (element->Attribute("visible"))
+		outLayer->visible = (element->IntAttribute("visible") == 1 ? true : false);
+	else
+		outLayer->visible = true;
 	outLayer->width = element->UnsignedAttribute("width");
 	outLayer->height = element->UnsignedAttribute("height");
 
@@ -545,10 +593,11 @@ TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTileset
 {
 	TmxReturn error = TmxReturn::kSuccess;
 
-	auto gid = element->UnsignedAttribute("gid");
-	auto flipXFlag = 0x80000000;
-	auto flipYFlag = 0x40000000;
-	auto flipDiagonalFlag = 0x20000000;
+	unsigned int gid = element->UnsignedAttribute("gid");
+
+	unsigned int flipXFlag = 0x80000000;
+	unsigned int flipYFlag = 0x40000000;
+	unsigned int flipDiagonalFlag = 0x20000000;
 
 	outTile->flipX = (gid & flipXFlag ? true : false);
 	outTile->flipY = (gid & flipYFlag ? true : false);
@@ -622,7 +671,7 @@ TmxReturn _parseObjectGroupNode(tinyxml2::XMLElement* element, TmxObjectGroup* o
 	}
 	else
 	{
-		outObjectGroup->visible = 1;
+		outObjectGroup->visible = true;
 	}
 
 	error = _parsePropertyNode(element->FirstChildElement("properties"), &outObjectGroup->propertyMap);
@@ -776,6 +825,51 @@ tmxparser::TmxReturn _parseOffsetNode(tinyxml2::XMLElement* element, TmxOffset* 
 	return error;
 }
 
+tmxparser::TmxReturn _parseImageLayerNode(tinyxml2::XMLElement* element, TmxImageLayer* outImageLayer)
+{
+	TmxReturn error = TmxReturn::kSuccess;
+
+	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE_STRING(element, "name", outImageLayer->name);
+	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "x", &outImageLayer->x);
+	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "y", &outImageLayer->y);
+	
+	// width: optional, default: 0
+	if (element->QueryUnsignedAttribute("width", &outImageLayer->widthInTiles) == tinyxml2::XML_NO_ATTRIBUTE)
+		outImageLayer->widthInTiles = 0U;
+	
+	// height: optional, default: 0
+	if (element->QueryUnsignedAttribute("height", &outImageLayer->heightInTiles) == tinyxml2::XML_NO_ATTRIBUTE)
+		outImageLayer->heightInTiles = 0U;
+
+	// opacity: optional, default: 1.0
+	if (element->QueryFloatAttribute("opacity", &outImageLayer->opacity) == tinyxml2::XML_NO_ATTRIBUTE)
+		outImageLayer->opacity = 1.f;
+
+	// visible: optional, default: true
+	if (element->QueryBoolAttribute("visible", &outImageLayer->visible) == tinyxml2::XML_NO_ATTRIBUTE)
+		outImageLayer->visible = true;
+
+	// properties: optional
+	if (element->FirstChildElement("properties") != NULL)
+	{
+		error = _parsePropertyNode(element->FirstChildElement("properties"), &outImageLayer->propertyMap);
+		if (error != kSuccess)
+		{
+			LOGE("Error parsing image layer property node...");
+			return error;
+		}
+	}
+
+	// image: optional
+	if (element->FirstChildElement("image") != NULL)
+	{
+		error = _parseImageNode(element->FirstChildElement("image"), &outImageLayer->image);
+		if (error != kSuccess)
+			return error;
+	}
+
+	return error;
 }
 
+}
 

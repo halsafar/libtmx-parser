@@ -186,6 +186,23 @@ typedef struct
 
 typedef struct
 {
+	std::string name;
+	unsigned int x;
+	unsigned int y;
+	unsigned int widthInTiles;
+	unsigned int heightInTiles;
+	float opacity;
+	bool visible;
+	TmxPropertyMap_t propertyMap;
+	TmxImage image;
+} TmxImageLayer;
+
+
+typedef std::vector<TmxImageLayer> TmxImageLayerCollection_t;
+
+
+typedef struct
+{
 	unsigned int firstgid;
 	std::string name;
 	unsigned int tileWidth;
@@ -246,6 +263,7 @@ typedef struct
 	TmxTilesetCollection_t tilesetCollection;
 	TmxLayerCollection_t layerCollection;
 	TmxObjectGroupCollection_t objectGroupCollection;
+	TmxImageLayerCollection_t imageLayerCollection;
 } TmxMap;
 
 

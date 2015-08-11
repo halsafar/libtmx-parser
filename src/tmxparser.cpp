@@ -830,9 +830,15 @@ tmxparser::TmxReturn _parseImageLayerNode(tinyxml2::XMLElement* element, TmxImag
 	TmxReturn error = TmxReturn::kSuccess;
 
 	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE_STRING(element, "name", outImageLayer->name);
-	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "x", &outImageLayer->x);
-	CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "y", &outImageLayer->y);
 	
+	// x : optional , default 0
+	if (element->QueryUnsignedAttribute("x", &outImageLayer->x) == tinyxml2::XML_NO_ATTRIBUTE)
+		outImageLayer->x = 0U;
+
+	// y : optional , default 0
+	if (element->QueryUnsignedAttribute("y", &outImageLayer->y) == tinyxml2::XML_NO_ATTRIBUTE)
+		outImageLayer->y = 0U;
+
 	// width: optional, default: 0
 	if (element->QueryUnsignedAttribute("width", &outImageLayer->widthInTiles) == tinyxml2::XML_NO_ATTRIBUTE)
 		outImageLayer->widthInTiles = 0U;

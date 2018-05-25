@@ -355,61 +355,97 @@ TmxReturn _parseImageNode(tinyxml2::XMLElement* element, TmxImage* outImage)
 }
 
 
+TmxReturn _parseTileset(tinyxml2::XMLElement* element, TmxTileset* outTileset)
+{
+  outTileset->name = element->Attribute("name");
+  CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "tilewidth", &outTileset->tileWidth);
+  CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "tileheight", &outTileset->tileHeight);
+  outTileset->tileSpacingInImage = element->UnsignedAttribute("spacing");
+  outTileset->tileMarginInImage = element->UnsignedAttribute("margin");
+
+  // TODO - read TODO at end of this function
+  if (element->FirstChildElement("image") == NULL)
+  {
+    LOGE("We do not support maps with tilesets that have no image associated currently...");
+    return kErrorParsing;
+  }
+
+  TmxImage image;
+  TmxReturn error = _parseImageNode(element->FirstChildElement("image"), &outTileset->image);
+  if (error)
+  {
+    LOGE("Error parsing image node...");
+    return error;
+  }
+
+  outTileset->offset.x = 0;
+  outTileset->offset.y = 0;
+
+  if (element->FirstChildElement("tileoffset") != NULL)
+  {
+    error = _parseOffsetNode(element->FirstChildElement("tileoffset"), &outTileset->offset);
+  }
+
+  for (tinyxml2::XMLElement* child = element->FirstChildElement("tile"); child != NULL; child = child->NextSiblingElement("tile"))
+  {
+    TmxTileDefinition tileDef;
+
+    tileDef.id = 0;
+
+    error = _parseTileDefinitionNode(child, &tileDef);
+    if (error)
+    {
+      LOGE("Error parsing tile definition");
+      return error;
+    }
+
+    outTileset->tileDefinitions[tileDef.id] = tileDef;
+  }
+
+  // derive row/col count, calculate tile indices
+  // TODO - this is why we do not accept tilesets without image tag atm
+  outTileset->colCount = (outTileset->image.width - outTileset->tileMarginInImage) / (outTileset->tileWidth + outTileset->tileSpacingInImage);
+  outTileset->rowCount = (outTileset->image.height - outTileset->tileMarginInImage) / (outTileset->tileHeight + outTileset->tileSpacingInImage);
+
+	return TmxReturn::kSuccess;
+}
+
+
 TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTileset)
 {
-
 	if (strcmp(element->Name(), "tileset") == 0)
 	{
 		CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "firstgid", &outTileset->firstgid);
-		outTileset->name = element->Attribute("name");
-		CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "tilewidth", &outTileset->tileWidth);
-		CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "tileheight", &outTileset->tileHeight);
-		outTileset->tileSpacingInImage = element->UnsignedAttribute("spacing");
-		outTileset->tileMarginInImage = element->UnsignedAttribute("margin");
 
-		// TODO - read TODO at end of this function
-		if (element->FirstChildElement("image") == NULL)
-		{
-			LOGE("We do not support maps with tilesets that have no image associated currently...");
-			return kErrorParsing;
-		}
+    // External tileset file
+    char const* source = element->Attribute("source");
+    if (source != nullptr)
+    {
+      tinyxml2::XMLDocument tileDoc;
+      if (tileDoc.LoadFile(source) != tinyxml2::XML_SUCCESS)
+      {
+        LOGE("Cannot read tileset xml file");
+        return TmxReturn::kErrorParsing;
+      }
 
-		TmxImage image;
-		TmxReturn error = _parseImageNode(element->FirstChildElement("image"), &outTileset->image);
-		if (error)
-		{
-			LOGE("Error parsing image node...");
-			return error;
-		}
+      tinyxml2::XMLElement* tileElement = tileDoc.FirstChildElement("tileset");
 
-		outTileset->offset.x = 0;
-		outTileset->offset.y = 0;
+      if (tileElement == NULL)
+      {
+        return TmxReturn::kMissingTilesetNode;
+      }
 
-		if (element->FirstChildElement("tileoffset") != NULL)
-		{
-			error = _parseOffsetNode(element->FirstChildElement("tileoffset"), &outTileset->offset);
-		}
+      outTileset->source = source;
 
-		for (tinyxml2::XMLElement* child = element->FirstChildElement("tile"); child != NULL; child = child->NextSiblingElement("tile"))
-		{
-			TmxTileDefinition tileDef;
+      return _parseTileset(tileElement, outTileset);
+    }
 
-			tileDef.id = 0;
+    // Embedded tileset
+    else
+    {
+      return _parseTileset(element, outTileset);
+    }
 
-			error = _parseTileDefinitionNode(child, &tileDef);
-			if (error)
-			{
-				LOGE("Error parsing tile definition");
-				return error;
-			}
-
-			outTileset->tileDefinitions[tileDef.id] = tileDef;
-		}
-
-		// derive row/col count, calculate tile indices
-		// TODO - this is why we do not accept tilesets without image tag atm
-		outTileset->colCount = (outTileset->image.width - outTileset->tileMarginInImage) / (outTileset->tileWidth + outTileset->tileSpacingInImage);
-		outTileset->rowCount = (outTileset->image.height - outTileset->tileMarginInImage) / (outTileset->tileHeight + outTileset->tileSpacingInImage);
 	}
 
 	return TmxReturn::kSuccess;

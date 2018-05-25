@@ -21,7 +21,7 @@ public:
 		}
 
 		_map = new tmxparser::TmxMap();
-		tmxparser::parseFromFile(mapPath, _map, "assets/textures/");
+		tmxparser::parseFromFile(mapPath, _map, "assets/textures");
 	}
 
 

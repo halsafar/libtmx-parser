@@ -22,7 +22,7 @@
   </tile>
  </tileset>
  <tileset firstgid="925" name="super_mario_one_tileset" tilewidth="16" tileheight="16" spacing="2" margin="2">
-  <image source="../../brickdodge/assets/textures/super_mario_one_tileset.png" width="528" height="448"/>
+  <image source="super_mario_one_tileset.png" width="528" height="448"/>
  </tileset>
  <tileset firstgid="1621" name="legend_of_zelda_one_overworld_tiles" tilewidth="16" tileheight="16" spacing="1" margin="1">
   <image source="legend_of_zelda_one_overworld_tiles.png" width="307" height="163"/>

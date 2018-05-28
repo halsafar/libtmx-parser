@@ -60,6 +60,7 @@ typedef enum
 	kMissingRequiredAttribute,
 	kMissingMapNode,
 	kMissingDataNode,
+  kMissingTilesetNode,
 	kMalformedPropertyNode,
 	kInvalidTileIndex,
 	kUnknownTileIndices,
@@ -203,6 +204,7 @@ typedef std::vector<TmxImageLayer> TmxImageLayerCollection_t;
 
 typedef struct
 {
+  std::string source;
 	unsigned int firstgid;
 	std::string name;
 	unsigned int tileWidth;

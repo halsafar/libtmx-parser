@@ -125,13 +125,15 @@ namespace tmxparser
 
 
 // Prototypes
+std::string _updatePath(std::string path, const std::string& tilesetPath);
 TmxReturn _parseStart(tinyxml2::XMLElement* element, TmxMap* outMap, const std::string& tilesetPath);
 TmxReturn _parseEnd(TmxMap* outMap, const std::string& tilesetPath);
 void _parseEndHelper(TmxImage& image, const std::string& tilesetPath);
-TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap);
+TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap, std::string filesetPath);
 TmxReturn _parsePropertyNode(tinyxml2::XMLElement* element, TmxPropertyMap_t* outPropertyMap);
 TmxReturn _parseImageNode(tinyxml2::XMLElement* element, TmxImage* outImage);
-TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTileset);
+TmxReturn _parseTileset(tinyxml2::XMLElement* element, TmxTileset* outTileset);
+TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTileset, std::string tilesetPath);
 TmxReturn _parseTileDefinitionNode(tinyxml2::XMLElement* element, TmxTileDefinition* outTileDefinition);
 TmxReturn _parseTileAnimationNode(tinyxml2::XMLElement* element, TmxAnimationFrameCollection_t* outAnimationCollection);
 TmxReturn _parseLayerNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayer* outLayer);
@@ -172,7 +174,7 @@ TmxReturn parseFromMemory(void* data, size_t length, TmxMap* outMap, const std::
 
 TmxReturn _parseStart(tinyxml2::XMLElement* element, TmxMap* outMap, const std::string& tilesetPath)
 {
-	TmxReturn retVal = _parseMapNode(element, outMap);
+	TmxReturn retVal = _parseMapNode(element, outMap, tilesetPath);
 	return (retVal == TmxReturn::kSuccess) ? _parseEnd(outMap, tilesetPath) : retVal;
 }
 
@@ -189,14 +191,14 @@ TmxReturn _parseEnd(TmxMap* outMap, const std::string& tilesetPath)
 }
 
 
-void _parseEndHelper(TmxImage& image, const std::string& tilesetPath)
+std::string _updatePath(std::string path, const std::string& tilesetPath)
 {
-	auto pathSeperatorMissing = (image.source.find(PATH_SEPARATOR) == std::string::npos);
-	auto pathSeperatorAltMissing = (image.source.find(PATH_SEPARATOR_ALT) == std::string::npos);
+	auto pathSeperatorMissing = (path.find(PATH_SEPARATOR) == std::string::npos);
+	auto pathSeperatorAltMissing = (path.find(PATH_SEPARATOR_ALT) == std::string::npos);
 
 	if (pathSeperatorMissing && pathSeperatorAltMissing) // no path_seperator found --> relative path
 	{
-		std::string baseFilename = image.source.substr(image.source.find_last_of(PATH_SEPARATOR) + 1);
+		std::string baseFilename = path.substr(path.find_last_of(PATH_SEPARATOR) + 1);
 
 		/*
 		 * here we find out what separator is used in tilesetPath and choose it
@@ -209,12 +211,20 @@ void _parseEndHelper(TmxImage& image, const std::string& tilesetPath)
 		if (!seperatorThere && seperatorAltThere) // only alternative separator exists in tilesetPath --> choose it
 			tileSetPathSeparator = PATH_SEPARATOR_ALT;
 
-		image.source = tilesetPath + tileSetPathSeparator + baseFilename;
+		return tilesetPath + tileSetPathSeparator + baseFilename;
 	}
+
+  return path;
 }
 
 
-TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
+void _parseEndHelper(TmxImage& image, const std::string& tilesetPath)
+{
+  image.source = _updatePath(image.source, tilesetPath);
+}
+
+
+TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap, std::string tilesetPath)
 {
 	if (element == NULL)
 	{
@@ -262,7 +272,7 @@ TmxReturn _parseMapNode(tinyxml2::XMLElement* element, TmxMap* outMap)
 	for (tinyxml2::XMLElement* child = element->FirstChildElement("tileset"); child != NULL; child = child->NextSiblingElement("tileset"))
 	{
 		TmxTileset set;
-		error = _parseTilesetNode(child, &set);
+		error = _parseTilesetNode(child, &set, tilesetPath);
 		if (error)
 		{
 			LOGE("Error processing tileset node...");
@@ -355,61 +365,109 @@ TmxReturn _parseImageNode(tinyxml2::XMLElement* element, TmxImage* outImage)
 }
 
 
-TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTileset)
+TmxReturn _parseTileset(tinyxml2::XMLElement* element, TmxTileset* outTileset)
 {
+  char const* name = element->Attribute("name");
+  if (name != nullptr)
+  {
+    outTileset->name = name;
+  }
 
+  CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "tilewidth", &outTileset->tileWidth);
+  CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "tileheight", &outTileset->tileHeight);
+  outTileset->tileSpacingInImage = element->UnsignedAttribute("spacing");
+  outTileset->tileMarginInImage = element->UnsignedAttribute("margin");
+
+  // TODO - read TODO at end of this function
+  if (element->FirstChildElement("image") == NULL)
+  {
+    LOGE("We do not support maps with tilesets that have no image associated currently...");
+    return kErrorParsing;
+  }
+
+  TmxImage image;
+  TmxReturn error = _parseImageNode(element->FirstChildElement("image"), &outTileset->image);
+  if (error)
+  {
+    LOGE("Error parsing image node...");
+    return error;
+  }
+
+  outTileset->offset.x = 0;
+  outTileset->offset.y = 0;
+
+  if (element->FirstChildElement("tileoffset") != NULL)
+  {
+    error = _parseOffsetNode(element->FirstChildElement("tileoffset"), &outTileset->offset);
+  }
+
+  for (tinyxml2::XMLElement* child = element->FirstChildElement("tile"); child != NULL; child = child->NextSiblingElement("tile"))
+  {
+    TmxTileDefinition tileDef;
+
+    tileDef.id = 0;
+
+    error = _parseTileDefinitionNode(child, &tileDef);
+    if (error)
+    {
+      LOGE("Error parsing tile definition");
+      return error;
+    }
+
+    outTileset->tileDefinitions[tileDef.id] = tileDef;
+  }
+
+  // derive row/col count, calculate tile indices
+  // TODO - this is why we do not accept tilesets without image tag atm
+  outTileset->colCount = (outTileset->image.width - outTileset->tileMarginInImage) / (outTileset->tileWidth + outTileset->tileSpacingInImage);
+  outTileset->rowCount = (outTileset->image.height - outTileset->tileMarginInImage) / (outTileset->tileHeight + outTileset->tileSpacingInImage);
+
+	return TmxReturn::kSuccess;
+}
+
+
+TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTileset, std::string tilesetPath)
+{
 	if (strcmp(element->Name(), "tileset") == 0)
 	{
 		CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "firstgid", &outTileset->firstgid);
-		outTileset->name = element->Attribute("name");
-		CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "tilewidth", &outTileset->tileWidth);
-		CHECK_AND_RETRIEVE_REQ_ATTRIBUTE(element->QueryUnsignedAttribute, "tileheight", &outTileset->tileHeight);
-		outTileset->tileSpacingInImage = element->UnsignedAttribute("spacing");
-		outTileset->tileMarginInImage = element->UnsignedAttribute("margin");
 
-		// TODO - read TODO at end of this function
-		if (element->FirstChildElement("image") == NULL)
-		{
-			LOGE("We do not support maps with tilesets that have no image associated currently...");
-			return kErrorParsing;
-		}
+    // External tileset file
+    char const* source = element->Attribute("source");
+    if (source != nullptr)
+    {
+      outTileset->source = source;
 
-		TmxImage image;
-		TmxReturn error = _parseImageNode(element->FirstChildElement("image"), &outTileset->image);
-		if (error)
-		{
-			LOGE("Error parsing image node...");
-			return error;
-		}
+      tinyxml2::XMLDocument tileDoc;
+      if (tileDoc.LoadFile(_updatePath(source, tilesetPath).c_str()) != tinyxml2::XML_SUCCESS)
+      {
+        LOGE("Cannot read tileset xml file");
+        return TmxReturn::kErrorParsing;
+      }
 
-		outTileset->offset.x = 0;
-		outTileset->offset.y = 0;
+      tinyxml2::XMLElement* tileElement = tileDoc.FirstChildElement("tileset");
 
-		if (element->FirstChildElement("tileoffset") != NULL)
-		{
-			error = _parseOffsetNode(element->FirstChildElement("tileoffset"), &outTileset->offset);
-		}
+      if (tileElement == NULL)
+      {
+        return TmxReturn::kMissingTilesetNode;
+      }
 
-		for (tinyxml2::XMLElement* child = element->FirstChildElement("tile"); child != NULL; child = child->NextSiblingElement("tile"))
-		{
-			TmxTileDefinition tileDef;
+      TmxReturn retVal = _parseTileset(tileElement, outTileset);
+      if (retVal != TmxReturn::kSuccess)
+      {
+        return retVal;
+      }
 
-			tileDef.id = 0;
+      outTileset->name = outTileset->source.substr(0, outTileset->source.rfind('.'));
 
-			error = _parseTileDefinitionNode(child, &tileDef);
-			if (error)
-			{
-				LOGE("Error parsing tile definition");
-				return error;
-			}
+    }
 
-			outTileset->tileDefinitions[tileDef.id] = tileDef;
-		}
+    // Embedded tileset
+    else
+    {
+      return _parseTileset(element, outTileset);
+    }
 
-		// derive row/col count, calculate tile indices
-		// TODO - this is why we do not accept tilesets without image tag atm
-		outTileset->colCount = (outTileset->image.width - outTileset->tileMarginInImage) / (outTileset->tileWidth + outTileset->tileSpacingInImage);
-		outTileset->rowCount = (outTileset->image.height - outTileset->tileMarginInImage) / (outTileset->tileHeight + outTileset->tileSpacingInImage);
 	}
 
 	return TmxReturn::kSuccess;

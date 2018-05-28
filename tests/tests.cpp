@@ -21,7 +21,7 @@ public:
 		}
 
 		_map = new tmxparser::TmxMap();
-		tmxparser::parseFromFile(mapPath, _map, "assets/textures/");
+		tmxparser::parseFromFile(mapPath, _map, "../test_files");
 	}
 
 
@@ -137,21 +137,21 @@ TEST_F(TmxParseTest, TilesetImageSourceProperties)
 	tmxparser::TmxTileset tileset = _map->tilesetCollection[0];
 	tmxparser::TmxImage image = tileset.image;
 
-	ASSERT_EQ("assets/textures/super_mario_one_tileset.png", image.source);
+	ASSERT_EQ("../test_files/super_mario_one_tileset.png", image.source);
 	ASSERT_EQ(528, image.width);
 	ASSERT_EQ(448, image.height);
 
 	tileset = _map->tilesetCollection[1];
 	image = tileset.image;
 
-	ASSERT_EQ("assets/textures/super_mario_one_tileset.png", image.source);
+	ASSERT_EQ("../test_files/super_mario_one_tileset.png", image.source);
 	ASSERT_EQ(528, image.width);
 	ASSERT_EQ(448, image.height);
 
 	tileset = _map->tilesetCollection[2];
 	image = tileset.image;
 
-	ASSERT_EQ("assets/textures/legend_of_zelda_one_overworld_tiles.png", image.source);
+	ASSERT_EQ("../test_files/legend_of_zelda_one_overworld_tiles.png", image.source);
 	ASSERT_EQ(307, image.width);
 	ASSERT_EQ(163, image.height);
 
@@ -271,6 +271,10 @@ int main(int argc, char **argv)
 
 	printf("\033[32m" "==========\nXML TESTS\n==========\n" "\033[0m");
 	TmxParseTest::LoadMap("../test_files/test_xml_level.tmx");
+	retVal = RUN_ALL_TESTS();
+
+	printf("\033[32m" "==========\nEXRERNAL TILESET TESTS\n==========\n" "\033[0m");
+	TmxParseTest::LoadMap("../test_files/test_xml_level_ext_tileset.tmx");
 	retVal = RUN_ALL_TESTS();
 
 	printf("\033[32m" "==========\nCSV TESTS\n==========\n" "\033[0m");

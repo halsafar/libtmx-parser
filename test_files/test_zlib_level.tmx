@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.8" tiledversion="1.8.2" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="11">
+ <tileset firstgid="1" name="super_mario_one_tileset" tilewidth="16" tileheight="16" tilecount="924" columns="33">
+  <image source="super_mario_one_tileset.png" width="528" height="448"/>
+  <tile id="3">
+   <objectgroup draworder="index">
+    <object id="0" x="3.18182" y="3.18182" width="3.63636" height="4.72727"/>
+   </objectgroup>
+  </tile>
+  <tile id="60">
+   <properties>
+    <property name="Test" value="1"/>
+   </properties>
+   <objectgroup draworder="index">
+    <object id="0" x="0" y="0" width="16" height="16"/>
+   </objectgroup>
+   <animation>
+    <frame tileid="60" duration="298"/>
+    <frame tileid="61" duration="100"/>
+    <frame tileid="62" duration="100"/>
+   </animation>
+  </tile>
+ </tileset>
+ <tileset firstgid="925" name="super_mario_one_tileset" tilewidth="16" tileheight="16" spacing="2" margin="2" tilecount="696" columns="29">
+  <image source="super_mario_one_tileset.png" width="528" height="448"/>
+ </tileset>
+ <tileset firstgid="1621" name="legend_of_zelda_one_overworld_tiles" tilewidth="16" tileheight="16" spacing="1" margin="1" tilecount="162" columns="18">
+  <image source="legend_of_zelda_one_overworld_tiles.png" width="307" height="163"/>
+ </tileset>
+ <layer id="1" name="World" width="10" height="10">
+  <data encoding="base64" compression="zlib">
+   eJzly8kRgkAAAMFFQIEwPPCKgTAAReWLB6j5v+w8nKp+ThRCmBGTkDJnQUZOwZIVazaUbNmx58CR2tzQcuJMx4UrN3oG7jx48mJk4s2HL1X4r356YQog
+  </data>
+ </layer>
+ <objectgroup id="2" name="Collision">
+  <object id="1" name="testRect" type="testRect" x="0" y="0" width="160" height="160">
+   <properties>
+    <property name="Test" value="1"/>
+   </properties>
+  </object>
+  <object id="2" name="testCircle" type="testType" x="48" y="83" width="73" height="73">
+   <ellipse/>
+  </object>
+  <object id="7" name="testPolygon" type="testPolygon" x="134" y="73">
+   <polygon points="0,0 8,59 -106,59 -79,-10"/>
+  </object>
+  <object id="9" name="testPolyline" type="testPolyline" x="15.5" y="69.5">
+   <polyline points="0,0 7,25.5 23.25,14.75 21,-6 1,-11.25 0.136364,0.318182"/>
+  </object>
+ </objectgroup>
+</map>

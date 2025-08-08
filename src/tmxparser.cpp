@@ -26,6 +26,7 @@ THE SOFTWARE.
 #include "tmxparser.h"
 
 #include "base64.h"
+#include "compression.h"
 
 
 #if (defined(_WIN32))
@@ -137,7 +138,7 @@ TmxReturn _parseTilesetNode(tinyxml2::XMLElement* element, TmxTileset* outTilese
 TmxReturn _parseTileDefinitionNode(tinyxml2::XMLElement* element, TmxTileDefinition* outTileDefinition);
 TmxReturn _parseTileAnimationNode(tinyxml2::XMLElement* element, TmxAnimationFrameCollection_t* outAnimationCollection);
 TmxReturn _parseLayerNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayer* outLayer);
-TmxReturn _parseLayerDataNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTileCollection_t* outTileCollection);
+TmxReturn _parseLayerDataNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTileCollection_t* outTileCollection, unsigned int dataLength);
 TmxReturn _parseLayerXmlTileNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTile* outTile);
 TmxReturn _calculateTileIndices(const TmxTilesetCollection_t& tilesets, TmxLayerTile* outTile);
 TmxReturn _parseObjectGroupNode(tinyxml2::XMLElement* element, TmxObjectGroup* outObjectGroup);
@@ -549,7 +550,7 @@ TmxReturn _parseLayerNode(tinyxml2::XMLElement* element, const TmxTilesetCollect
 	tinyxml2::XMLElement* dataElement = element->FirstChildElement("data");
 	if (dataElement != NULL)
 	{
-		error = _parseLayerDataNode(dataElement, tilesets, &outLayer->tiles);
+		error = _parseLayerDataNode(dataElement, tilesets, &outLayer->tiles, outLayer->width * outLayer->height * 4);
 	}
 	else
 	{
@@ -561,18 +562,12 @@ TmxReturn _parseLayerNode(tinyxml2::XMLElement* element, const TmxTilesetCollect
 }
 
 
-TmxReturn _parseLayerDataNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTileCollection_t* outTileCollection)
+TmxReturn _parseLayerDataNode(tinyxml2::XMLElement* element, const TmxTilesetCollection_t& tilesets, TmxLayerTileCollection_t* outTileCollection, unsigned int dataLength)
 {
 	TmxReturn error = TmxReturn::kSuccess;
 
 	const char* encoding = element->Attribute("encoding");
 	const char* compression = element->Attribute("compression");
-
-	if (compression != NULL)
-	{
-		LOGE("Does not support compression yet...");
-		return TmxReturn::kErrorParsing;
-	}
 
 	if (encoding == NULL)
 	{
@@ -616,13 +611,33 @@ TmxReturn _parseLayerDataNode(tinyxml2::XMLElement* element, const TmxTilesetCol
 		csvbase64.erase(std::remove(csvbase64.begin(), csvbase64.end(), '\r'), csvbase64.end());
 		csvbase64.erase(std::remove(csvbase64.begin(), csvbase64.end(), ' '), csvbase64.end());
 
-		std::string csv = base64_decode(csvbase64);
-
-		unsigned int length = csv.size() / sizeof(unsigned int);
+		std::string data = base64_decode(csvbase64);
+		std::vector<char> uncompressed_data;
 
 		// tiled base64 layer data is an unsigned 32bit array little endian
 		// TODO - verify this on other platforms, write some tests
-		unsigned int* p = (unsigned int*)csv.c_str();
+		unsigned int* p;
+
+		if (compression)
+		{
+			if (strcmp(compression, "gzip") == 0)
+				uncompressed_data = decompress(data, dataLength, Gzip);
+			else if (strcmp(compression, "zlib") == 0)
+				uncompressed_data = decompress(data, dataLength, Zlib);
+			else if (strcmp(compression, "zstd") == 0)
+				uncompressed_data = decompress(data, dataLength, Zstandard);
+			else
+			{
+				LOGE("Unsupported compression format: %s", compression);
+				return TmxReturn::kErrorParsing;
+			}
+			p = (unsigned int*) uncompressed_data.data();
+		}
+		else
+			p = (unsigned int*) data.data();
+
+		unsigned int length = dataLength / 4;
+
 		for (unsigned int i = 0; i < length; i++)
 		{
 			TmxLayerTile tile;
@@ -638,7 +653,7 @@ TmxReturn _parseLayerDataNode(tinyxml2::XMLElement* element, const TmxTilesetCol
 	}
 	else
 	{
-		LOGE("Unsupported layer compression [%s]... coming soon...", encoding);
+		LOGE("Unsupported encoding: %s", encoding);
 		return TmxReturn::kErrorParsing;
 	}
 
